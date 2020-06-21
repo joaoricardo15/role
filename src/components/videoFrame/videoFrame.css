@@ -1,3 +1,7 @@
-.jitsiContainer {
-  height: 100vh;
+.visibleContainer {
+  height: 60vh;
+}
+
+.hiddenContainer {
+  display: none;
 }
