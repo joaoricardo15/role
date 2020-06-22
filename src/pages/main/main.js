@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
   SwipeableList,
   SwipeableListItem,
@@ -12,7 +12,9 @@ import { RecentRoomComponent } from "./../../components/recentRoom/recentRoom";
 import "./main.css";
 
 const MainPage = () => {
-  const { initialRoomName } = useParams();
+  const initialRoomName = new URLSearchParams(useLocation().search).get(
+    "initialRoomName"
+  );
   const [displayName, setDisplayName] = useState(
     localStorage.getItem("displayName")
   );
