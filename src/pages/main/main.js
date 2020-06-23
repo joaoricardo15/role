@@ -10,6 +10,7 @@ import {
   FiMicOff,
   FiPhoneMissed,
   FiGrid,
+  FiMessageSquare,
   FiPlusCircle,
   FiPlayCircle,
   FiAtSign,
@@ -106,6 +107,10 @@ const MainPage = () => {
     if (videoApi) videoApi.executeCommand("toggleTileView");
   };
 
+  const toggleChat = () => {
+    if (videoApi) videoApi.executeCommand("toggleChat");
+  };
+
   const hangUp = () => {
     // setRoomName(null);
     // if (videoApi) videoApi.dispose();
@@ -200,6 +205,9 @@ const MainPage = () => {
         </IconButton>
         <IconButton size="small" onClick={toggleViewMode} disabled={!roomName}>
           <FiGrid />
+        </IconButton>
+        <IconButton size="small" onClick={toggleChat} disabled={!roomName}>
+          <FiMessageSquare />
         </IconButton>
         <IconButton size="small" onClick={hangUp} disabled={!roomName}>
           <FiPhoneMissed />

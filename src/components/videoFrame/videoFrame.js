@@ -16,7 +16,7 @@ export const VideoFrameComponent = ({ roomName, onLoad, camera, mic }) => {
     if (onLoad) onLoad();
     setTimeout(() => {
       const waterMark = document.getElementsByClassName("watermark")[0];
-      if (waterMark) waterMark.style.display = "none";
+      if (waterMark) waterMark.style.display = "none !important";
     }, 1000);
   };
 
@@ -45,8 +45,9 @@ export const VideoFrameComponent = ({ roomName, onLoad, camera, mic }) => {
         },
       },
       interfaceConfigOverwrite: {
-        SHOW_JITSI_WATERMARK: true,
-        JITSI_WATERMARK_LINK: " ",
+        SHOW_JITSI_WATERMARK: false,
+        SHOW_WATERMARK_FOR_GUESTS: false,
+        //JITSI_WATERMARK_LINK: " ",
         DEFAULT_BACKGROUND: "white",
         DEFAULT_LOCAL_DISPLAY_NAME: "você",
         DEFAULT_REMOTE_DISPLAY_NAME: null,
