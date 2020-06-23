@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Typography } from "@material-ui/core";
 import Card from "@material-ui/core/Card";
-import { FiTrash2 } from "react-icons/fi";
+import { FiX, FiHeart } from "react-icons/fi";
 
 const InstallCardComponent = () => {
   const [installationEvent, setInstallationEvent] = useState(null);
@@ -40,7 +40,7 @@ const InstallCardComponent = () => {
           alignItems: "center",
         }}
       >
-        <FiTrash2 color="secondary" onClick={closePainel} />
+        <FiX color="secondary" onClick={closePainel} />
         <Typography
           style={{
             flex: 1,
@@ -54,7 +54,7 @@ const InstallCardComponent = () => {
         <Button
           color="primary"
           variant="outlined"
-          startIcon={<FiTrash2 />}
+          startIcon={<FiHeart />}
           onClick={installApp}
         >
           Instalar

@@ -1,15 +1,13 @@
 .container {
-  height: 34px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 1px solid #42424266;
-  border-radius: 5px;
   padding: 0 15px;
 }
 
 .title {
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 600;
   color: #424242;
   max-width: 100%;

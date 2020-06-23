@@ -12,14 +12,21 @@ import {
   FiGrid,
   FiPlusCircle,
   FiPlayCircle,
+  FiAtSign,
 } from "react-icons/fi";
 import {
   videoApi,
   VideoFrameComponent,
 } from "./../../components/videoFrame/videoFrame";
-import RoomCardComponent from "../../components/roomCard/roomCard";
+import ShareCardComponent from "../../components/shareCard/shareCard";
 import InstallCardComponent from "../../components/installCard/installCard";
 import "./main.css";
+import {
+  IconButton,
+  TextField,
+  InputAdornment,
+  ButtonGroup,
+} from "@material-ui/core";
 
 const MainPage = () => {
   const [mic, setMic] = useState(false);
@@ -80,6 +87,10 @@ const MainPage = () => {
     setLoading(false);
   };
 
+  const getRandomRoom = () => {
+    return Math.random().toString(36).substring(7);
+  };
+
   const toggleCamera = () => {
     setCamera(!camera);
     if (videoApi) videoApi.executeCommand("toggleVideo");
@@ -96,12 +107,13 @@ const MainPage = () => {
   };
 
   const hangUp = () => {
-    setRoomName(null);
-    if (videoApi) videoApi.dispose();
+    // setRoomName(null);
+    // if (videoApi) videoApi.dispose();
+    setRoomName(getRandomRoom());
   };
 
   useEffect(() => {
-    if (initialRoomName) openRoom(initialRoomName);
+    openRoom(initialRoomName || getRandomRoom());
   }, []);
 
   return (
@@ -111,65 +123,55 @@ const MainPage = () => {
           <div className="header" style={style}>
             <div className="headerFirstLine">
               <div className="greetings">
-                <div className="greetingsTitle">Olá</div>
-                <input
-                  className="nameInput"
+                <TextField
                   value={displayName}
-                  placeholder="Digite seu apelido"
+                  placeholder="seu apelido"
                   onChange={(e) => onNameChange(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <FiAtSign />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </div>
-              <div className="controlPanel">
-                <div onClick={toggleCamera}>
-                  {camera ? <FiVideo /> : <FiVideoOff />}
+              <div className="currentRoomContainer">
+                <div className="currentRoomIdentification">
+                  {/* <div className="currentRoomTitle">você está em </div> */}
+                  <div className="currentRoomCard">
+                    <ShareCardComponent
+                      text={"convide a galera"}
+                      roomName={roomName}
+                    />
+                  </div>
                 </div>
-                <div onClick={toggleMic}>{mic ? <FiMic /> : <FiMicOff />}</div>
               </div>
             </div>
-            {!loading &&
-              (roomName ? (
-                <div className="currentRoomContainer">
-                  <div className="currentRoomIdentification">
-                    <div className="currentRoomTitle">você está em </div>
-                    <div className="currentRoomCard">
-                      <RoomCardComponent roomName={roomName} />
-                    </div>
-                  </div>
-                  <div className="currentRoomControlPainel">
-                    <div onClick={toggleViewMode}>
-                      <FiGrid />
-                    </div>
-                    <div onClick={hangUp}>
-                      <FiPhoneMissed />
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="newRoomContainer">
-                  <div
-                    className="randomRoomContainer"
-                    onClick={() =>
-                      openRoom(Math.random().toString(36).substring(7))
-                    }
-                  >
-                    <div>rolê aleatório</div>
-                    <div className="newRoomIcon">
-                      <FiPlayCircle />
-                    </div>
-                  </div>
-                  <div className="createRoomContainer">
-                    <input
-                      value={newRoomName}
-                      className="createRoomInput"
-                      placeholder="novo rolê"
-                      onChange={(e) => setNewRoomName(e.target.value)}
-                    />
-                    <div className="newRoomIcon" onClick={onCreateRoom}>
-                      <FiPlusCircle />
-                    </div>
+            {/* {!loading && !roomName && (
+              <div className="newRoomContainer">
+                <Chip
+                    clickable
+                    color="primary"
+                    label="Rolê aleatório"
+                    onClick={() => openRoom(getRandomRoom())}
+                    deleteIcon={<FiPlayCircle />}
+                    onDelete={null}
+                    variant="outlined"
+                  />
+                <div className="createRoomContainer">
+                  <TextField
+                    value={newRoomName}
+                    className="createRoomInput"
+                    placeholder="novo rolê"
+                    onChange={(e) => setNewRoomName(e.target.value)}
+                  />
+                  <div className="newRoomIcon" onClick={onCreateRoom}>
+                    <FiPlusCircle />
                   </div>
                 </div>
-              ))}
+              </div>
+            )} */}
           </div>
         )}
       </Sticky>
@@ -189,13 +191,27 @@ const MainPage = () => {
           />
         )}
       </div>
-      {recentRooms && recentRooms.length > 0 && (
+      <ButtonGroup style={{ width: "100%", justifyContent: "center" }}>
+        <IconButton onClick={toggleCamera}>
+          {camera ? <FiVideo /> : <FiVideoOff />}
+        </IconButton>
+        <IconButton onClick={toggleMic}>
+          {mic ? <FiMic /> : <FiMicOff />}
+        </IconButton>
+        <IconButton size="small" onClick={toggleViewMode} disabled={!roomName}>
+          <FiGrid />
+        </IconButton>
+        <IconButton size="small" onClick={hangUp} disabled={!roomName}>
+          <FiPhoneMissed />
+        </IconButton>
+      </ButtonGroup>
+      {/* {recentRooms && recentRooms.length > 0 && (
         <div className="recentRoomsListContainer">
           <div>últimos rolês visitados</div>
           <div className="recentRoomsList">
             {recentRooms.map((recentRoomName, index) => (
               <div className="recentRoom">
-                <RoomCardComponent
+                <ShareCardComponent
                   roomName={recentRoomName}
                   onClick={() => openRoom(recentRoomName)}
                   onSwipe={() => deleteFromRecentRooms(recentRoomName)}
@@ -204,7 +220,7 @@ const MainPage = () => {
             ))}
           </div>
         </div>
-      )}
+      )} */}
       <InstallCardComponent />
     </StickyContainer>
   );

@@ -51,8 +51,6 @@ export const VideoFrameComponent = ({ roomName, onLoad, camera, mic }) => {
         DEFAULT_LOCAL_DISPLAY_NAME: "você",
         DEFAULT_REMOTE_DISPLAY_NAME: null,
         VIDEO_QUALITY_LABEL_DISABLED: true,
-        DISABLE_VIDEO_BACKGROUND: true,
-        TOOLBAR_ALWAYS_VISIBLE: true,
         CONNECTION_INDICATOR_DISABLED: true,
         // TILE_VIEW_MAX_COLUMNS: 5,
         TOOLBAR_BUTTONS: [
@@ -93,6 +91,7 @@ export const VideoFrameComponent = ({ roomName, onLoad, camera, mic }) => {
     // eslint-disable-next-line no-undef
     videoApi = new JitsiMeetExternalAPI(domain, options);
     videoApi.addEventListener("videoConferenceJoined", onJoined);
+    videoApi.executeCommand("avatarUrl", "./logo.png");
     if (!camera) videoApi.executeCommand("toggleVideo");
     if (!mic) videoApi.executeCommand("toggleAudio");
 
@@ -103,7 +102,7 @@ export const VideoFrameComponent = ({ roomName, onLoad, camera, mic }) => {
     <div>
       {loading && (
         <div className="loadingContainer">
-          <div className="loadingTitle">entrando em {roomName}...</div>
+          <div className="loadingTitle">entrando em uma nova sala...</div>
           <div className="loadingAnimation">
             <PacmanLoader loading={loading} color="#424242" size="6vh" />
           </div>

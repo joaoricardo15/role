@@ -5,7 +5,7 @@
 }
 
 .headerFirstLine {
-  height: 36px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -13,36 +13,12 @@
 }
 
 .greetings {
-  display: flex;
-  align-items: center;
-}
-
-.greetingsTitle {
-  font-size: 20px;
+  width: 35%;
 }
 
 .nameInput {
-  width: 70%;
-  font-size: 20px;
-  background-color: transparent;
-  border: 0;
-  margin-left: 5px;
-}
-
-.controlPanel {
-  width: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-right: 10px;
-}
-
-.currentRoomContainer {
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0 10px;
+  width: 100%;
+  font-size: 50px;
 }
 
 .currentRoomIdentification {
@@ -57,12 +33,12 @@
 
 .currentRoomCard {
   height: 36;
-  max-width: 50vw;
+  max-width: 80vw;
   margin-left: 10px;
 }
 
 .currentRoomControlPainel {
-  width: 50px;
+  width: 80px;
   display: flex;
   align-items: center;
   justify-content: space-between;
