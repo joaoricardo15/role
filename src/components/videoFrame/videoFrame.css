@@ -1,5 +1,5 @@
 .visibleContainer {
-  height: 60vh;
+  height: 70vh;
 }
 
 .hiddenContainer {
@@ -7,13 +7,14 @@
 }
 
 .loadingContainer {
+  height: 70vh;
   margin-left: 20px;
 }
 
 .loadingTitle {
-  height: 40px;
-  padding: 10px;
+  margin-top: 10px;
 }
 
 .loadingAnimation {
+  margin-top: 30px;
 }

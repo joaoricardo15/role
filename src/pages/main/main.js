@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import ReactGA from "react-ga";
 import Webcam from "react-webcam";
 import { useLocation } from "react-router-dom";
+import { StickyContainer, Sticky } from "react-sticky";
 import {
   FiVideo,
   FiVideoOff,
@@ -9,6 +10,8 @@ import {
   FiMicOff,
   FiPhoneMissed,
   FiGrid,
+  FiPlusCircle,
+  FiPlayCircle,
 } from "react-icons/fi";
 import {
   videoApi,
@@ -101,46 +104,80 @@ const MainPage = () => {
   }, []);
 
   return (
-    <div>
-      <div className="header">
-        <div className="greetings">
-          <div className="greetingsTitle">Olá</div>
-          <input
-            className="nameInput"
-            value={displayName}
-            placeholder="Digite seu apelido"
-            onChange={(e) => onNameChange(e.target.value)}
-          />
-        </div>
-        <div className="controlPanel">
-          <div onClick={toggleCamera}>
-            {camera ? <FiVideo /> : <FiVideoOff />}
-          </div>
-          <div onClick={toggleMic}>{mic ? <FiMic /> : <FiMicOff />}</div>
-        </div>
-      </div>
-      {roomName && !loading && (
-        <div className="actualRoomContainer">
-          <div className="actualRoomTitle">você está em </div>
-          <div className="actualRoomCard">
-            <RoomCardComponent roomName={roomName} />
-          </div>
-          <div className="actualRoomControlPainel">
-            <div onClick={hangUp}>
-              <FiPhoneMissed />
+    <StickyContainer>
+      <Sticky>
+        {({ style }) => (
+          <div className="header" style={style}>
+            <div className="headerFirstLine">
+              <div className="greetings">
+                <div className="greetingsTitle">Olá</div>
+                <input
+                  className="nameInput"
+                  value={displayName}
+                  placeholder="Digite seu apelido"
+                  onChange={(e) => onNameChange(e.target.value)}
+                />
+              </div>
+              <div className="controlPanel">
+                <div onClick={toggleCamera}>
+                  {camera ? <FiVideo /> : <FiVideoOff />}
+                </div>
+                <div onClick={toggleMic}>{mic ? <FiMic /> : <FiMicOff />}</div>
+              </div>
             </div>
-            <div onClick={toggleViewMode}>
-              <FiGrid />
-            </div>
+            {!loading &&
+              (roomName ? (
+                <div className="currentRoomContainer">
+                  <div className="currentRoomIdentification">
+                    <div className="currentRoomTitle">você está em </div>
+                    <div className="currentRoomCard">
+                      <RoomCardComponent roomName={roomName} />
+                    </div>
+                  </div>
+                  <div className="currentRoomControlPainel">
+                    <div onClick={toggleViewMode}>
+                      <FiGrid />
+                    </div>
+                    <div onClick={hangUp}>
+                      <FiPhoneMissed />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="newRoomContainer">
+                  <div
+                    className="randomRoomContainer"
+                    onClick={() =>
+                      openRoom(Math.random().toString(36).substring(7))
+                    }
+                  >
+                    <div>rolê aleatório</div>
+                    <div className="newRoomIcon">
+                      <FiPlayCircle />
+                    </div>
+                  </div>
+                  <div className="createRoomContainer">
+                    <input
+                      value={newRoomName}
+                      className="createRoomInput"
+                      placeholder="novo rolê"
+                      onChange={(e) => setNewRoomName(e.target.value)}
+                    />
+                    <div className="newRoomIcon" onClick={onCreateRoom}>
+                      <FiPlusCircle />
+                    </div>
+                  </div>
+                </div>
+              ))}
           </div>
-        </div>
-      )}
+        )}
+      </Sticky>
       <div className="videoContainer">
         {!roomName ? (
           !camera ? (
             <image src="./public/logo192.png" />
           ) : (
-            <Webcam audio={false} mirrored />
+            <Webcam audio={false} width="100%" height="100%" mirrored />
           )
         ) : (
           <VideoFrameComponent
@@ -150,24 +187,6 @@ const MainPage = () => {
             mic={mic}
           />
         )}
-      </div>
-      <div>
-        <button
-          onClick={() => openRoom(Math.random().toString(36).substring(7))}
-        >
-          se jogue num papo aleatório
-        </button>
-        <div className="createRoomForm">
-          <input
-            value={newRoomName}
-            className="createRoomInput"
-            placeholder="Nome do rolê"
-            onChange={(e) => setNewRoomName(e.target.value)}
-          />
-          <button onClick={onCreateRoom} disabled={!newRoomName}>
-            Criar rolê
-          </button>
-        </div>
       </div>
       {recentRooms && recentRooms.length > 0 && (
         <div className="recentRoomsListContainer">
@@ -185,7 +204,7 @@ const MainPage = () => {
           </div>
         </div>
       )}
-    </div>
+    </StickyContainer>
   );
 };
 

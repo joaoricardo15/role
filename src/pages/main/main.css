@@ -1,4 +1,10 @@
 .header {
+  z-index: 1;
+  background-color: white;
+  padding-bottom: 10px;
+}
+
+.headerFirstLine {
   height: 36px;
   display: flex;
   align-items: center;
@@ -16,6 +22,7 @@
 }
 
 .nameInput {
+  width: 70%;
   font-size: 20px;
   background-color: transparent;
   border: 0;
@@ -30,7 +37,7 @@
   margin-right: 10px;
 }
 
-.actualRoomContainer {
+.currentRoomContainer {
   height: 36px;
   display: flex;
   align-items: center;
@@ -38,17 +45,23 @@
   margin: 0 10px;
 }
 
-.actualRoomTitle {
+.currentRoomIdentification {
+  display: flex;
+  align-items: center;
+}
+
+.currentRoomTitle {
   font-size: 12px;
   text-align: center;
 }
 
-.actualRoomCard {
+.currentRoomCard {
   height: 36;
   max-width: 50vw;
+  margin-left: 10px;
 }
 
-.actualRoomControlPainel {
+.currentRoomControlPainel {
   width: 50px;
   display: flex;
   align-items: center;
@@ -56,9 +69,34 @@
   margin-right: 10px;
 }
 
+.newRoomContainer {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 20px 0 10px;
+}
+
+.randomRoomContainer {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  border: 1px solid;
+  border-radius: 5px;
+  padding: 2px 10px;
+}
+
+.createRoomContainer {
+  display: flex;
+  align-items: center;
+}
+
+.newRoomIcon {
+  margin-left: 10px;
+}
+
 .videoContainer {
-  height: 60vh;
-  overflow-y: hidden;
+  height: 70vh;
 }
 
 .createRoomInput {
