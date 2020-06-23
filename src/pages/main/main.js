@@ -30,7 +30,7 @@ import {
 } from "@material-ui/core";
 
 const MainPage = () => {
-  const [mic, setMic] = useState(false);
+  const [mic, setMic] = useState(true);
   const [camera, setCamera] = useState(true);
   const [viewMode, setViewMode] = useState(true);
   const [loading, setLoading] = useState(false);
