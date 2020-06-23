@@ -17,7 +17,8 @@ import {
   videoApi,
   VideoFrameComponent,
 } from "./../../components/videoFrame/videoFrame";
-import { RoomCardComponent } from "../../components/roomCard/roomCard";
+import RoomCardComponent from "../../components/roomCard/roomCard";
+import InstallCardComponent from "../../components/installCard/installCard";
 import "./main.css";
 
 const MainPage = () => {
@@ -204,6 +205,7 @@ const MainPage = () => {
           </div>
         </div>
       )}
+      <InstallCardComponent />
     </StickyContainer>
   );
 };

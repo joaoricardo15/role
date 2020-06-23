@@ -4,7 +4,7 @@ import { SwipeableListItem } from "@sandstreamdev/react-swipeable-list";
 import { FiTrash2 } from "react-icons/fi";
 import "./roomCard.css";
 
-export const RoomCardComponent = ({ roomName, onClick, onSwipe }) => {
+const RoomCardComponent = ({ roomName, onClick, onSwipe }) => {
   const renderContent = () => (
     <div className="container" onClick={onClick}>
       <div className="title">{roomName}</div>
@@ -35,3 +35,5 @@ export const RoomCardComponent = ({ roomName, onClick, onSwipe }) => {
     renderContent()
   );
 };
+
+export default RoomCardComponent;
