@@ -9,10 +9,13 @@
     "@testing-library/user-event": "^7.1.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-ga": "^3.0.0",
+    "react-icons": "^3.10.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
     "react-share": "^4.2.0",
-    "react-spinners": "^0.9.0"
+    "react-spinners": "^0.9.0",
+    "react-webcam": "^5.2.0"
   },
   "scripts": {
     "start": "react-scripts start",

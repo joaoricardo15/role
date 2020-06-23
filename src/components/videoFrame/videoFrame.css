@@ -5,3 +5,15 @@
 .hiddenContainer {
   display: none;
 }
+
+.loadingContainer {
+  margin-left: 20px;
+}
+
+.loadingTitle {
+  height: 40px;
+  padding: 10px;
+}
+
+.loadingAnimation {
+}

@@ -1,0 +1,41 @@
+.container {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #42424266;
+  border-radius: 5px;
+  padding: 0 15px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #424242;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shareButton {
+  margin-left: 5px;
+}
+
+.deleteButton {
+  left: 10px;
+  right: 10px;
+  position: absolute;
+  height: 36px;
+  background-color: red;
+  color: white;
+  border-radius: 5px;
+  justify-content: flex-end;
+  z-index: -1;
+}
+
+.deleteIcon {
+  height: 100%;
+  font-size: 20px;
+  float: right;
+  margin-right: 10px;
+}

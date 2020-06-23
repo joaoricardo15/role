@@ -1,5 +1,9 @@
 .header {
-  margin: 20px 0 20px 10px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 10px;
 }
 
 .greetings {
@@ -11,46 +15,68 @@
   font-size: 20px;
 }
 
-.nameForm {
-  margin-left: 5px;
-}
-
 .nameInput {
   font-size: 20px;
   background-color: transparent;
   border: 0;
+  margin-left: 5px;
 }
 
-.nameInput:focus {
-  border: 0;
+.controlPanel {
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-right: 10px;
+}
+
+.actualRoomContainer {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 10px;
 }
 
 .actualRoomTitle {
   font-size: 12px;
+  text-align: center;
 }
 
-.actualRoom {
-  width: fit-content;
-  margin-top: 5px;
+.actualRoomCard {
+  height: 36;
+  max-width: 50vw;
+}
+
+.actualRoomControlPainel {
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-right: 10px;
+}
+
+.videoContainer {
+  height: 60vh;
+  overflow-y: hidden;
+}
+
+.createRoomInput {
+  width: 30vw;
+}
+
+.recentRoomsListContainer {
+  margin: 10px;
 }
 
 .recentRoomsList {
   display: flex;
   flex-direction: column;
-  margin: 10px;
+  margin-top: 5px;
 }
 
 .recentRoom {
   width: 100%;
   margin-bottom: 5px;
-}
-
-.createRoomForm {
-  position: absolute;
-  top: 20px;
-  right: 10px;
-}
-
-.createRoomInput {
-  width: 30vw;
+  background-color: white;
 }

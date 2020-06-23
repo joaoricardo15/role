@@ -7,25 +7,24 @@ const parentNode = "jitsiContainer";
 
 export let videoApi;
 
-export const VideoFrameComponent = ({ roomName, onClose, onLoad }) => {
+export const VideoFrameComponent = ({ roomName, onLoad, camera, mic }) => {
   const [loading, setLoading] = useState(true);
   const displayName = localStorage.getItem("displayName");
-
-  const hangUp = () => {
-    if (videoApi) videoApi.dispose();
-    if (onClose) onClose();
-  };
 
   const onJoined = () => {
     setLoading(false);
     if (onLoad) onLoad();
+    setTimeout(() => {
+      const waterMark = document.getElementsByClassName("watermark")[0];
+      if (waterMark) waterMark.style.display = "none";
+    }, 1000);
   };
 
   useEffect(() => {
     if (!loading) setLoading(true);
-    //if (videoApi) videoApi.dispose();
+    if (videoApi) videoApi.dispose();
     const options = {
-      roomName,
+      roomName: `rolê_${roomName}`,
       parentNode: document.querySelector(`#${parentNode}`),
       userInfo: {
         displayName: displayName,
@@ -34,11 +33,11 @@ export const VideoFrameComponent = ({ roomName, onClose, onLoad }) => {
         resolution: 240,
         disableDeepLinking: true,
         disableAudioLevels: true,
-        startWithAudioMuted: true,
         enableTalkWhileMuted: false,
         disableRemoteMute: true,
         remoteVideoMenu: {
           disableKick: true,
+          disableAudioLevel: true,
         },
         p2p: {
           enabled: true,
@@ -47,66 +46,69 @@ export const VideoFrameComponent = ({ roomName, onClose, onLoad }) => {
       },
       interfaceConfigOverwrite: {
         SHOW_JITSI_WATERMARK: true,
-        DEFAULT_LOGO_URL: "../images/watermark.png",
         JITSI_WATERMARK_LINK: " ",
         DEFAULT_BACKGROUND: "white",
         DEFAULT_LOCAL_DISPLAY_NAME: "você",
         DEFAULT_REMOTE_DISPLAY_NAME: null,
         VIDEO_QUALITY_LABEL_DISABLED: true,
+        DISABLE_VIDEO_BACKGROUND: true,
+        TOOLBAR_ALWAYS_VISIBLE: true,
+        CONNECTION_INDICATOR_DISABLED: true,
+        // TILE_VIEW_MAX_COLUMNS: 5,
         TOOLBAR_BUTTONS: [
-          // "chat",
-          // "camera",
-          // "hangup",
+          //"chat",
+          //"camera",
+          //"hangup",
+          //"microphone",
+          //"fullscreen",
           // "microphone",
+          // "camera",
+          // "closedcaptions",
+          // "desktop",
           // "fullscreen",
+          // "fodeviceselection",
+          // "profile",
+          // "chat",
+          // "recording",
+          // "livestreaming",
+          // "etherpad",
           // "sharedvideo",
-          "microphone",
-          "camera",
-          "closedcaptions",
-          "desktop",
-          "fullscreen",
-          "fodeviceselection",
-          "hangup",
-          "profile",
-          "chat",
-          "recording",
-          "livestreaming",
-          "etherpad",
-          "sharedvideo",
-          "settings",
-          "raisehand",
-          "videoquality",
-          "filmstrip",
-          "invite",
-          "feedback",
-          "stats",
-          "shortcuts",
-          "tileview",
-          "videobackgroundblur",
-          "download",
-          "help",
-          "mute-everyone",
-          "security",
+          // "settings",
+          // "raisehand",
+          // "videoquality",
+          // "filmstrip",
+          // "invite",
+          // "feedback",
+          // "stats",
+          // "shortcuts",
+          // "tileview",
+          // "videobackgroundblur",
+          // "download",
+          // "help",
+          // "mute-everyone",
+          // "security",
         ],
       },
     };
     // eslint-disable-next-line no-undef
     videoApi = new JitsiMeetExternalAPI(domain, options);
     videoApi.addEventListener("videoConferenceJoined", onJoined);
-    videoApi.addEventListener("readyToClose", hangUp);
-    videoApi.executeCommand("toggleFilmStrip");
+    if (!camera) videoApi.executeCommand("toggleVideo");
+    if (!mic) videoApi.executeCommand("toggleAudio");
 
     videoApi.executeCommand("subject", " ");
   }, [roomName]);
 
   return (
     <div>
-      <PacmanLoader
-        loading={loading}
-        color="#424242"
-        size="6vh"
-        css="height: 60vh; margin-left: 20px;"
-      />
+      {loading && (
+        <div className="loadingContainer">
+          <div className="loadingTitle">entrando em {roomName}...</div>
+          <div className="loadingAnimation">
+            <PacmanLoader loading={loading} color="#424242" size="6vh" />
+          </div>
+        </div>
+      )}
       <div
         id={parentNode}
         className={loading ? "hiddenContainer" : "visibleContainer"}

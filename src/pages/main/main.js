@@ -1,28 +1,37 @@
 import React, { useState, useEffect } from "react";
+import ReactGA from "react-ga";
+import Webcam from "react-webcam";
 import { useLocation } from "react-router-dom";
 import {
-  SwipeableList,
-  SwipeableListItem,
-} from "@sandstreamdev/react-swipeable-list";
+  FiVideo,
+  FiVideoOff,
+  FiMic,
+  FiMicOff,
+  FiPhoneMissed,
+  FiGrid,
+} from "react-icons/fi";
 import {
   videoApi,
   VideoFrameComponent,
 } from "./../../components/videoFrame/videoFrame";
-import { RecentRoomComponent } from "./../../components/recentRoom/recentRoom";
+import { RoomCardComponent } from "../../components/roomCard/roomCard";
 import "./main.css";
 
 const MainPage = () => {
-  const initialRoomName = new URLSearchParams(useLocation().search).get(
-    "initialRoomName"
-  );
-  const [displayName, setDisplayName] = useState(
-    localStorage.getItem("displayName")
-  );
+  const [mic, setMic] = useState(false);
+  const [camera, setCamera] = useState(true);
+  const [viewMode, setViewMode] = useState(true);
   const [loading, setLoading] = useState(false);
   const [roomName, setRoomName] = useState(null);
   const [newRoomName, setNewRoomName] = useState("");
   const [recentRooms, setRecentRooms] = useState(
     JSON.parse(localStorage.getItem("recentRooms"))
+  );
+  const [displayName, setDisplayName] = useState(
+    localStorage.getItem("displayName")
+  );
+  const initialRoomName = new URLSearchParams(useLocation().search).get(
+    "initialRoomName"
   );
 
   const onNameChange = (name) => {
@@ -44,8 +53,9 @@ const MainPage = () => {
 
   const openRoom = (roomName) => {
     setLoading(true);
-    setRoomName(`${roomName}`);
+    setRoomName(roomName);
     updateRecentRooms(roomName);
+    ReactGA.pageview(roomName);
   };
 
   const updateRecentRooms = (roomName) => {
@@ -66,8 +76,24 @@ const MainPage = () => {
     setLoading(false);
   };
 
-  const onCloseRoom = () => {
+  const toggleCamera = () => {
+    setCamera(!camera);
+    if (videoApi) videoApi.executeCommand("toggleVideo");
+  };
+
+  const toggleMic = () => {
+    setMic(!mic);
+    if (videoApi) videoApi.executeCommand("toggleAudio");
+  };
+
+  const toggleViewMode = () => {
+    setViewMode(!viewMode);
+    if (videoApi) videoApi.executeCommand("toggleTileView");
+  };
+
+  const hangUp = () => {
     setRoomName(null);
+    if (videoApi) videoApi.dispose();
   };
 
   useEffect(() => {
@@ -79,23 +105,58 @@ const MainPage = () => {
       <div className="header">
         <div className="greetings">
           <div className="greetingsTitle">Olá</div>
-          <form className="nameForm">
-            <input
-              className="nameInput"
-              value={displayName}
-              placeholder="Digite seu apelido"
-              onChange={(e) => onNameChange(e.target.value)}
-            />
-          </form>
+          <input
+            className="nameInput"
+            value={displayName}
+            placeholder="Digite seu apelido"
+            onChange={(e) => onNameChange(e.target.value)}
+          />
         </div>
-        {roomName && !loading && (
-          <div>
-            <div className="actualRoomTitle">você está em </div>
-            <div className="actualRoom">
-              <RecentRoomComponent roomName={roomName} />
+        <div className="controlPanel">
+          <div onClick={toggleCamera}>
+            {camera ? <FiVideo /> : <FiVideoOff />}
+          </div>
+          <div onClick={toggleMic}>{mic ? <FiMic /> : <FiMicOff />}</div>
+        </div>
+      </div>
+      {roomName && !loading && (
+        <div className="actualRoomContainer">
+          <div className="actualRoomTitle">você está em </div>
+          <div className="actualRoomCard">
+            <RoomCardComponent roomName={roomName} />
+          </div>
+          <div className="actualRoomControlPainel">
+            <div onClick={hangUp}>
+              <FiPhoneMissed />
+            </div>
+            <div onClick={toggleViewMode}>
+              <FiGrid />
             </div>
           </div>
+        </div>
+      )}
+      <div className="videoContainer">
+        {!roomName ? (
+          !camera ? (
+            <image src="./public/logo192.png" />
+          ) : (
+            <Webcam audio={false} mirrored />
+          )
+        ) : (
+          <VideoFrameComponent
+            roomName={roomName}
+            onLoad={onLoadRoom}
+            camera={camera}
+            mic={mic}
+          />
         )}
+      </div>
+      <div>
+        <button
+          onClick={() => openRoom(Math.random().toString(36).substring(7))}
+        >
+          se jogue num papo aleatório
+        </button>
         <div className="createRoomForm">
           <input
             value={newRoomName}
@@ -108,51 +169,22 @@ const MainPage = () => {
           </button>
         </div>
       </div>
-      {roomName && (
-        <VideoFrameComponent
-          roomName={roomName}
-          onClose={onCloseRoom}
-          onLoad={onLoadRoom}
-        />
+      {recentRooms && recentRooms.length > 0 && (
+        <div className="recentRoomsListContainer">
+          <div>últimos rolês visitados</div>
+          <div className="recentRoomsList">
+            {recentRooms.map((recentRoomName, index) => (
+              <div className="recentRoom">
+                <RoomCardComponent
+                  roomName={recentRoomName}
+                  onClick={() => openRoom(recentRoomName)}
+                  onSwipe={() => deleteFromRecentRooms(recentRoomName)}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
       )}
-      <div className="recentRoomsList">
-        {recentRooms &&
-          recentRooms.length > 0 &&
-          recentRooms.map(
-            (recentRoomName, index) =>
-              !(roomName && index === 0) && (
-                <div className="recentRoom" key={recentRoomName}>
-                  <RecentRoomComponent
-                    roomName={recentRoomName}
-                    onClick={() => openRoom(recentRoomName)}
-                  />
-                  <button onClick={() => deleteFromRecentRooms(recentRoomName)}>
-                    Deletar
-                  </button>
-                </div>
-              )
-            // <SwipeableList>
-            //   {recentRooms.map(
-            //     (recentRoomName, index) =>
-            //       !(roomName && index === 0) && (
-            //         <SwipeableListItem
-            //           swipeLeft={{
-            //             content: <div></div>,
-            //             action: () => deleteFromRecentRooms(recentRoomName),
-            //           }}
-            //         >
-            //           <div className="recentRoom">
-            //             <RecentRoomComponent
-            //               roomName={recentRoomName}
-            //               onClick={() => openRoon(recentRoomName)}
-            //             />
-            //           </div>
-            //         </SwipeableListItem>
-            //       )
-            //   )}
-            // </SwipeableList>
-          )}
-      </div>
     </div>
   );
 };
