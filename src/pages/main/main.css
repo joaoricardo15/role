@@ -1,7 +1,6 @@
 .header {
   z-index: 1;
   background-color: white;
-  padding-bottom: 10px;
 }
 
 .headerFirstLine {
@@ -16,67 +15,44 @@
   width: 35%;
 }
 
-.nameInput {
-  width: 100%;
-  font-size: 50px;
-}
-
-.currentRoomIdentification {
-  display: flex;
-  align-items: center;
-}
-
-.currentRoomTitle {
-  font-size: 12px;
-  text-align: center;
-}
-
-.currentRoomCard {
-  height: 36;
-  max-width: 80vw;
-  margin-left: 10px;
-}
-
-.currentRoomControlPainel {
-  width: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-right: 10px;
-}
-
-.newRoomContainer {
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0 20px 0 10px;
-}
-
-.randomRoomContainer {
-  display: flex;
-  align-items: center;
-  font-size: 15px;
-  border: 1px solid;
-  border-radius: 5px;
-  padding: 2px 10px;
-}
-
-.createRoomContainer {
-  display: flex;
-  align-items: center;
-}
-
-.newRoomIcon {
-  margin-left: 10px;
-}
-
 .videoContainer {
   height: 70vh;
 }
 
-.createRoomInput {
-  width: 30vw;
+.noVideoContainer {
+  display: inline-grid;
+  justify-items: center;
+  padding: 30px;
+}
+
+.noVideoImage {
+  animation: rotate 10s infinite linear;
+}
+
+@keyframes rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.noVideoTitle {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.roomButtonContainer {
+  width: 80%;
+  margin: 10px 10% !important;
+}
+
+.newRoomButton {
+  width: 80vw;
+}
+
+.currentRoomCard {
+  height: 36;
+  width: 80vw;
+  margin-left: 10px;
 }
 
 .recentRoomsListContainer {

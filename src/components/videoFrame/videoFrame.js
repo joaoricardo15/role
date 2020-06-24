@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PacmanLoader from "react-spinners/PacmanLoader";
+import luachAnimation from "./../../assets/lauch.gif";
 import "./videoFrame.css";
 
 const domain = "meet.jit.si";
@@ -7,17 +8,36 @@ const parentNode = "jitsiContainer";
 
 export let videoApi;
 
-export const VideoFrameComponent = ({ roomName, onLoad, camera, mic }) => {
+export const VideoFrameComponent = ({
+  roomName,
+  onLoad,
+  camera,
+  mic,
+  onMuted,
+}) => {
   const [loading, setLoading] = useState(true);
   const displayName = localStorage.getItem("displayName");
 
   const onJoined = () => {
     setLoading(false);
     if (onLoad) onLoad();
-    setTimeout(() => {
-      const waterMark = document.getElementsByClassName("watermark")[0];
-      if (waterMark) waterMark.style.display = "none !important";
-    }, 1000);
+
+    // let iframe = document.querySelector("iframe");
+    // const waterMark = iframe.getElementsByClassName("watermark")[0];
+    // if (waterMark) waterMark.style.display = "none";
+    //document.body.requestFullscreen();
+
+    //const iframe = document.getElementById("jitsiConferenceFrame0");
+    // const iframeDom = iframe.contentDocument || iframe.contentWindow.document;
+    // const elmnt = iframeDom.getElementsByClassName("watermark")[0];
+    // elmnt.style.display = "none";
+
+    // var el = document.getElementById("iframeId").contentWindow.document;
+
+    // setTimeout(() => {
+    //   const waterMark = document.getElementsByClassName("watermark")[0];
+    //   if (waterMark) waterMark.style.display = "none";
+    // }, 1000);
   };
 
   useEffect(() => {
@@ -30,36 +50,39 @@ export const VideoFrameComponent = ({ roomName, onLoad, camera, mic }) => {
         displayName: displayName,
       },
       configOverwrite: {
+        subject: " ", // hide room name
+        noSSL: true,
         resolution: 240,
+        defaultLanguage: "es",
+        enableClosePage: false,
+        enableWelcomePage: false,
         disableDeepLinking: true,
         disableAudioLevels: true,
         enableTalkWhileMuted: false,
-        disableRemoteMute: true,
+        enableNoAudioDetection: false,
+        enableNoisyMicDetection: false,
+        desktopSharingSources: true,
+        //disableRemoteMute: true,
         remoteVideoMenu: {
-          disableKick: true,
-          disableAudioLevel: true,
+          // disableKick: true,
         },
         p2p: {
           enabled: true,
-          stunServers: [{ urls: "stun:meet-jit-si-turnrelay.jitsi.net:443" }],
         },
       },
       interfaceConfigOverwrite: {
-        SHOW_JITSI_WATERMARK: false,
-        SHOW_WATERMARK_FOR_GUESTS: false,
-        //JITSI_WATERMARK_LINK: " ",
         DEFAULT_BACKGROUND: "white",
         DEFAULT_LOCAL_DISPLAY_NAME: "você",
         DEFAULT_REMOTE_DISPLAY_NAME: null,
         VIDEO_QUALITY_LABEL_DISABLED: true,
         CONNECTION_INDICATOR_DISABLED: true,
-        // TILE_VIEW_MAX_COLUMNS: 5,
+        TILE_VIEW_MAX_COLUMNS: 2,
         TOOLBAR_BUTTONS: [
           //"chat",
-          //"camera",
-          //"hangup",
-          //"microphone",
-          //"fullscreen",
+          // "camera",
+          // "hangup",
+          // "microphone",
+          // "fullscreen",
           // "microphone",
           // "camera",
           // "closedcaptions",
@@ -67,7 +90,6 @@ export const VideoFrameComponent = ({ roomName, onLoad, camera, mic }) => {
           // "fullscreen",
           // "fodeviceselection",
           // "profile",
-          // "chat",
           // "recording",
           // "livestreaming",
           // "etherpad",
@@ -87,26 +109,39 @@ export const VideoFrameComponent = ({ roomName, onLoad, camera, mic }) => {
           // "mute-everyone",
           // "security",
         ],
+        JITSI_WATERMARK_LINK: " ",
+        SHOW_JITSI_WATERMARK: false,
+        SHOW_WATERMARK_FOR_GUESTS: false,
       },
     };
     // eslint-disable-next-line no-undef
     videoApi = new JitsiMeetExternalAPI(domain, options);
     videoApi.addEventListener("videoConferenceJoined", onJoined);
+    videoApi.addEventListener("audioMuteStatusChanged", (payload) => {
+      if (onMuted) onMuted(payload.muted);
+    });
+    videoApi.addEventListener("incomingMessage", (payload) => {
+      alert("in: " + payload.message);
+    });
+    videoApi.addEventListener("outgoingMessage", (payload) => {
+      alert("out: " + payload.message);
+      videoApi.executeCommand("sendEndpointTextMessage", "", payload.message);
+    });
     videoApi.executeCommand("avatarUrl", "./logo.png");
     if (!camera) videoApi.executeCommand("toggleVideo");
     if (!mic) videoApi.executeCommand("toggleAudio");
-
-    videoApi.executeCommand("subject", " ");
   }, [roomName]);
 
   return (
     <div>
       {loading && (
         <div className="loadingContainer">
-          <div className="loadingTitle">entrando em uma nova sala...</div>
+          <img src={luachAnimation} width="100%" alt="loading" />
+          <div className="loadingTitle">entrando no rolê...</div>
+          {/* <div className="loadingTitle">entrando no rolê...</div>
           <div className="loadingAnimation">
             <PacmanLoader loading={loading} color="#424242" size="6vh" />
-          </div>
+          </div> */}
         </div>
       )}
       <div

@@ -7,14 +7,14 @@
 }
 
 .loadingContainer {
-  height: 70vh;
-  margin-left: 20px;
+  //padding: 30%;
 }
 
 .loadingTitle {
-  margin-top: 10px;
+  text-align: center;
+  padding-top: 10px;
 }
 
 .loadingAnimation {
-  margin-top: 30px;
+  padding-top: 30px;
 }

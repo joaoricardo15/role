@@ -11,7 +11,6 @@ import {
   FiPhoneMissed,
   FiGrid,
   FiMessageSquare,
-  FiPlusCircle,
   FiPlayCircle,
   FiAtSign,
 } from "react-icons/fi";
@@ -27,10 +26,11 @@ import {
   TextField,
   InputAdornment,
   ButtonGroup,
+  Button,
 } from "@material-ui/core";
 
 const MainPage = () => {
-  const [mic, setMic] = useState(true);
+  const [mic, setMic] = useState(false);
   const [camera, setCamera] = useState(true);
   const [viewMode, setViewMode] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -50,11 +50,6 @@ const MainPage = () => {
     localStorage.setItem("displayName", name);
     setDisplayName(name);
     if (videoApi) videoApi.executeCommand("displayName", name);
-  };
-
-  const onCreateRoom = () => {
-    if (newRoomName) openRoom(newRoomName);
-    setNewRoomName("");
   };
 
   const deleteFromRecentRooms = (roomName) => {
@@ -88,6 +83,10 @@ const MainPage = () => {
     setLoading(false);
   };
 
+  const onMuted = (muted) => {
+    setMic(!muted);
+  };
+
   const getRandomRoom = () => {
     return Math.random().toString(36).substring(7);
   };
@@ -112,13 +111,25 @@ const MainPage = () => {
   };
 
   const hangUp = () => {
-    // setRoomName(null);
-    // if (videoApi) videoApi.dispose();
-    setRoomName(getRandomRoom());
+    setRoomName(null);
+    if (videoApi) videoApi.dispose();
+    //setRoomName(getRandomRoom());
+  };
+
+  const sendMessage = (message) => {
+    if (videoApi) {
+      videoApi.executeCommand(
+        "sendEndpointTextMessage",
+        "receiverParticipantId",
+        message
+      );
+    }
   };
 
   useEffect(() => {
-    openRoom(initialRoomName || getRandomRoom());
+    // alert(initialRoomName);
+    // console.log(initialRoomName);
+    if (initialRoomName) openRoom(initialRoomName);
   }, []);
 
   return (
@@ -140,17 +151,6 @@ const MainPage = () => {
                     ),
                   }}
                 />
-              </div>
-              <div className="currentRoomContainer">
-                <div className="currentRoomIdentification">
-                  {/* <div className="currentRoomTitle">você está em </div> */}
-                  <div className="currentRoomCard">
-                    <ShareCardComponent
-                      text={"convide a galera"}
-                      roomName={roomName}
-                    />
-                  </div>
-                </div>
               </div>
             </div>
             {/* {!loading && !roomName && (
@@ -182,20 +182,49 @@ const MainPage = () => {
       </Sticky>
       <div className="videoContainer">
         {!roomName ? (
-          !camera ? (
-            <image src="./public/logo192.png" />
+          camera ? (
+            <Webcam audio={false} height="100%" width="100%" mirrored />
           ) : (
-            <Webcam audio={false} width="100%" height="100%" mirrored />
+            <div className="noVideoContainer">
+              <img
+                className="noVideoImage"
+                src={process.env.PUBLIC_URL + "/logo.png"}
+                width="80%"
+                alt="logo"
+              />
+              <div className="noVideoTitle">câmera desligada</div>
+            </div>
           )
         ) : (
           <VideoFrameComponent
             roomName={roomName}
-            onLoad={onLoadRoom}
+            onMuted={onMuted}
             camera={camera}
             mic={mic}
           />
         )}
       </div>
+      <div className="roomButtonContainer">
+        {!roomName ? (
+          <Button
+            color="secondary"
+            variant="contained"
+            className="newRoomButton"
+            startIcon={<FiPlayCircle />}
+            onClick={() => openRoom(getRandomRoom())}
+          >
+            Criar rolê
+          </Button>
+        ) : (
+          <div
+            className="currentRoomCard"
+            onClick={() => document.getElementById}
+          >
+            <ShareCardComponent text={"convide a galera"} roomName={roomName} />
+          </div>
+        )}
+      </div>
+
       <ButtonGroup style={{ width: "100%", justifyContent: "center" }}>
         <IconButton onClick={toggleCamera}>
           {camera ? <FiVideo /> : <FiVideoOff />}
@@ -209,7 +238,12 @@ const MainPage = () => {
         <IconButton size="small" onClick={toggleChat} disabled={!roomName}>
           <FiMessageSquare />
         </IconButton>
-        <IconButton size="small" onClick={hangUp} disabled={!roomName}>
+        <IconButton
+          size="small"
+          color="secondary"
+          onClick={hangUp}
+          disabled={!roomName}
+        >
           <FiPhoneMissed />
         </IconButton>
       </ButtonGroup>
