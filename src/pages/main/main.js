@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactGA from "react-ga";
 import Webcam from "react-webcam";
+import { isMobile } from "react-device-detect";
 import { useLocation } from "react-router-dom";
 import { StickyContainer, Sticky } from "react-sticky";
 import { WhatsappShareButton, WhatsappIcon } from "react-share";
@@ -24,17 +25,20 @@ import {
   Button,
 } from "@material-ui/core";
 //import Axios from "axios";
+import { w3cwebsocket } from "websocket";
 import {
   videoApi,
   VideoFrameComponent,
 } from "./../../components/videoFrame/videoFrame";
-//import ShareCardComponent from "../../components/shareCard/shareCard";
+import ShareCardComponent from "../../components/shareCard/shareCard";
 import InstallCardComponent from "../../components/installCard/installCard";
 import noVideoAnimation from "./../../assets/astronaut.gif";
 import "./main.css";
 
 // const serverUserEndpoint = "http://localhost:1000/user";
 // const serverRoomEndpoint = "http://localhost:1000/rooms";
+let websocketClient;
+const serverUrl = "ws://localhost:1000";
 
 const MainPage = () => {
   const [mic, setMic] = useState(true);
@@ -44,7 +48,7 @@ const MainPage = () => {
 
   // const [loading, setLoading] = useState(false);
   // const [newRoomName, setNewRoomName] = useState("");
-  //const [onlineRooms, setOnlineRooms] = useState([]);
+  const [onlineRooms, setOnlineRooms] = useState([]);
   const [recentRooms, setRecentRooms] = useState(
     JSON.parse(localStorage.getItem("recentRooms"))
   );
@@ -68,7 +72,6 @@ const MainPage = () => {
   // };
 
   const openRoom = (roomName) => {
-    // setLoading(true);
     setRoomName(roomName);
     updateRecentRooms(roomName);
     ReactGA.pageview(roomName);
@@ -94,13 +97,22 @@ const MainPage = () => {
   //   );
   // };
 
-  // const updateMyStatusOnServer = () => {
-  //   Axios.post(serverUserEndpoint, {
-  //     id: localStorage.getItem("userId"),
-  //     displayName: displayName,
-  //     roomName: roomName,
-  //   });
-  // };
+  const updateMyStatusOnServer = () => {
+    if (websocketClient.readyState === websocketClient.OPEN) {
+      websocketClient.send(
+        JSON.stringify({
+          id: localStorage.getItem("userId"),
+          displayName: displayName,
+          roomName: roomName,
+        })
+      );
+    }
+    // Axios.post(serverUserEndpoint, {
+    //   id: localStorage.getItem("userId"),
+    //   displayName: displayName,
+    //   roomName: roomName,
+    // });
+  };
 
   const onRoomEnter = () => {
     //updateMyStatusOnServer();
@@ -150,6 +162,27 @@ const MainPage = () => {
     if (videoApi) videoApi.executeCommand("toggleShareScreen");
   };
 
+  const startServerConnection = () => {
+    websocketClient = new w3cwebsocket(
+      `${serverUrl}/user/?id=${localStorage.getItem(
+        "userId"
+      )}&displayName=${displayName}&roomName=${initialRoomName}`
+    );
+
+    websocketClient.onopen = () => {
+      websocketClient.onmessage = (message) => {
+        alert(JSON.stringify(message));
+      };
+    };
+
+    //onServerUpdate;
+  };
+
+  const onServerUpdate = (message) => {
+    const payload = JSON.parse(message);
+    if (payload.onlineRooms) setOnlineRooms(payload.onlineRooms);
+  };
+
   // const sendMessage = (message) => {
   //   if (videoApi) {
   //     videoApi.executeCommand(
@@ -168,6 +201,7 @@ const MainPage = () => {
     // getUsersStatusOnServer();
     // setInterval(() => getUsersStatusOnServer(), 10000);
     // window.addEventListener("beforeunload", onRoomLeave());
+    //startServerConnection();
   }, []);
 
   return (
@@ -264,7 +298,7 @@ const MainPage = () => {
               <WhatsappShareButton
                 id="shareButton"
                 className="inviteShareButton"
-                url={`https://injoy.chat/?initialRoomName=${roomName}`}
+                url={`https://www.injoy.chat/?initialRoomName=${roomName}`}
               >
                 <WhatsappIcon size={24} round={true} />
               </WhatsappShareButton>
@@ -289,14 +323,16 @@ const MainPage = () => {
         {/* <IconButton size="small" onClick={toggleChat} disabled={!roomName}>
           <FiMessageSquare />
         </IconButton> */}
-        <IconButton
-          size="small"
-          color={shareScreen && "secondary"}
-          onClick={toggleShateScreen}
-          disabled={!roomName}
-        >
-          <FiShare />
-        </IconButton>
+        {!isMobile && (
+          <IconButton
+            size="small"
+            color={shareScreen && "secondary"}
+            onClick={toggleShateScreen}
+            disabled={!roomName}
+          >
+            <FiShare />
+          </IconButton>
+        )}
         <IconButton
           size="small"
           color="secondary"
@@ -306,7 +342,7 @@ const MainPage = () => {
           <FiPhoneMissed />
         </IconButton>
       </ButtonGroup>
-      {/* {onlineRooms.length > 0 && (
+      {onlineRooms.length > 0 && (
         <div className="recentRoomsListContainer">
           <div> salas disponíveis </div>
           <div className="recentRoomsList">
@@ -320,7 +356,7 @@ const MainPage = () => {
             ))}
           </div>
         </div>
-      )} */}
+      )}
       {/* {recentRooms && recentRooms.length > 0 && (
         <div className="recentRoomsListContainer">
           <div>últimos rolês visitados</div>

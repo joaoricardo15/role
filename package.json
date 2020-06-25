@@ -10,6 +10,7 @@
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
     "react": "^16.13.1",
+    "react-device-detect": "^1.13.1",
     "react-dom": "^16.13.1",
     "react-ga": "^3.0.0",
     "react-icons": "^3.10.0",
@@ -18,7 +19,8 @@
     "react-share": "^4.2.0",
     "react-spinners": "^0.9.0",
     "react-sticky": "^6.0.3",
-    "react-webcam": "^5.2.0"
+    "react-webcam": "^5.2.0",
+    "websocket": "^1.0.31"
   },
   "scripts": {
     "start": "react-scripts start",

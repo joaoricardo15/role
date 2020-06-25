@@ -81,12 +81,11 @@ export const VideoFrameComponent = ({
         TILE_VIEW_MAX_COLUMNS: 2,
         TOOLBAR_BUTTONS: [
           //"chat",
-          // "camera",
           // "hangup",
+          // "camera",
           // "microphone",
           // "fullscreen",
           // "microphone",
-          // "camera",
           // "closedcaptions",
           // "desktop",
           // "fullscreen",
