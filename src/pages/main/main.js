@@ -33,9 +33,9 @@ const MainPage = () => {
   const [mic, setMic] = useState(false);
   const [camera, setCamera] = useState(true);
   const [viewMode, setViewMode] = useState(true);
-  const [loading, setLoading] = useState(false);
   const [roomName, setRoomName] = useState(null);
-  const [newRoomName, setNewRoomName] = useState("");
+  // const [loading, setLoading] = useState(false);
+  // const [newRoomName, setNewRoomName] = useState("");
   const [recentRooms, setRecentRooms] = useState(
     JSON.parse(localStorage.getItem("recentRooms"))
   );
@@ -52,14 +52,14 @@ const MainPage = () => {
     if (videoApi) videoApi.executeCommand("displayName", name);
   };
 
-  const deleteFromRecentRooms = (roomName) => {
-    const updatetRecentRooms = recentRooms.filter((x) => x !== roomName);
-    setRecentRooms(updatetRecentRooms);
-    localStorage.setItem("recentRooms", JSON.stringify(updatetRecentRooms));
-  };
+  // const deleteFromRecentRooms = (roomName) => {
+  //   const updatetRecentRooms = recentRooms.filter((x) => x !== roomName);
+  //   setRecentRooms(updatetRecentRooms);
+  //   localStorage.setItem("recentRooms", JSON.stringify(updatetRecentRooms));
+  // };
 
   const openRoom = (roomName) => {
-    setLoading(true);
+    // setLoading(true);
     setRoomName(roomName);
     updateRecentRooms(roomName);
     ReactGA.pageview(roomName);
@@ -79,9 +79,9 @@ const MainPage = () => {
     localStorage.setItem("recentRooms", JSON.stringify(updatedRecentRooms));
   };
 
-  const onLoadRoom = () => {
-    setLoading(false);
-  };
+  // const onLoadRoom = () => {
+  //   setLoading(false);
+  // };
 
   const onMuted = (muted) => {
     setMic(!muted);
@@ -116,15 +116,15 @@ const MainPage = () => {
     //setRoomName(getRandomRoom());
   };
 
-  const sendMessage = (message) => {
-    if (videoApi) {
-      videoApi.executeCommand(
-        "sendEndpointTextMessage",
-        "receiverParticipantId",
-        message
-      );
-    }
-  };
+  // const sendMessage = (message) => {
+  //   if (videoApi) {
+  //     videoApi.executeCommand(
+  //       "sendEndpointTextMessage",
+  //       "receiverParticipantId",
+  //       message
+  //     );
+  //   }
+  // };
 
   useEffect(() => {
     // alert(initialRoomName);
@@ -212,14 +212,14 @@ const MainPage = () => {
             startIcon={<FiPlayCircle />}
             onClick={() => openRoom(getRandomRoom())}
           >
-            Criar rolê
+            Criar sala
           </Button>
         ) : (
           <div
             className="currentRoomCard"
             onClick={() => document.getElementById}
           >
-            <ShareCardComponent text={"convide a galera"} roomName={roomName} />
+            <ShareCardComponent text={"enviar convite"} roomName={roomName} />
           </div>
         )}
       </div>

@@ -137,7 +137,7 @@ export const VideoFrameComponent = ({
       {loading && (
         <div className="loadingContainer">
           <img src={luachAnimation} width="100%" alt="loading" />
-          <div className="loadingTitle">entrando no rolê...</div>
+          <div className="loadingTitle">entrando na sala...</div>
           {/* <div className="loadingTitle">entrando no rolê...</div>
           <div className="loadingAnimation">
             <PacmanLoader loading={loading} color="#424242" size="6vh" />
