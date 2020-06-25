@@ -18,7 +18,7 @@ const ShareCardComponent = ({ title, message, onClick, onSwipe }) => {
           {message && (
             <WhatsappShareButton
               id="shareButton"
-              url={`https://master.d2eac7u7abqstu.amplifyapp.com/?initialRoomName=${message}`}
+              url={`https://injoy.chat/?initialRoomName=${message}`}
             >
               <WhatsappIcon size={20} round={true} />
             </WhatsappShareButton>

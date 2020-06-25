@@ -169,6 +169,7 @@ const MainPage = () => {
             <div className="headerFirstLine">
               <div className="greetings">
                 <TextField
+                  color="secondary"
                   value={displayName}
                   placeholder="seu apelido"
                   onChange={(e) => onNameChange(e.target.value)}
@@ -253,7 +254,7 @@ const MainPage = () => {
               <WhatsappShareButton
                 id="shareButton"
                 className="inviteButton"
-                url={`https://master.d2eac7u7abqstu.amplifyapp.com/?initialRoomName=${roomName}`}
+                url={`https://injoy.chat/?initialRoomName=${roomName}`}
               >
                 <WhatsappIcon size={24} round={true} />
               </WhatsappShareButton>
