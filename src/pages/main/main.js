@@ -209,7 +209,6 @@ const MainPage = () => {
           <Button
             color="secondary"
             variant="contained"
-            className="newRoomButton"
             startIcon={<FiPlayCircle />}
             onClick={() => openRoom(getRandomRoom())}
           >

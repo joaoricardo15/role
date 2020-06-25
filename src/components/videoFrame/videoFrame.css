@@ -7,14 +7,13 @@
 }
 
 .loadingContainer {
-  //padding: 30%;
+  height: 70vh;
+  width: 50vh;
+  padding-top: 70px;
+  margin-left: calc((100vw - 50vh) / 2);
 }
 
 .loadingTitle {
   text-align: center;
   padding-top: 10px;
-}
-
-.loadingAnimation {
-  padding-top: 30px;
 }

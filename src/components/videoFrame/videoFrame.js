@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import PacmanLoader from "react-spinners/PacmanLoader";
-import luachAnimation from "./../../assets/lauch.gif";
+//import PacmanLoader from "react-spinners/PacmanLoader";
+import luachAnimation from "./../../assets/launch.gif";
 import "./videoFrame.css";
 
 const domain = "meet.jit.si";
