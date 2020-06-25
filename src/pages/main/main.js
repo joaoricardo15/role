@@ -3,6 +3,7 @@ import ReactGA from "react-ga";
 import Webcam from "react-webcam";
 import { useLocation } from "react-router-dom";
 import { StickyContainer, Sticky } from "react-sticky";
+import { WhatsappShareButton, WhatsappIcon } from "react-share";
 import {
   FiVideo,
   FiVideoOff,
@@ -86,10 +87,9 @@ const MainPage = () => {
   };
 
   const getUsersStatusOnServer = () => {
-    Axios.get(serverRoomEndpoint).then((response) => {
-      alert(JSON.stringify(response.data));
-      setOnlineRooms(response.data);
-    });
+    Axios.get(serverRoomEndpoint).then((response) =>
+      setOnlineRooms(response.data)
+    );
   };
 
   const updateMyStatusOnServer = () => {
@@ -101,11 +101,11 @@ const MainPage = () => {
   };
 
   const onRoomEnter = () => {
-    updateMyStatusOnServer();
+    //updateMyStatusOnServer();
   };
 
   const onRoomLeave = () => {
-    updateMyStatusOnServer();
+    //updateMyStatusOnServer();
   };
 
   const hangUp = () => {
@@ -157,8 +157,9 @@ const MainPage = () => {
     if (initialRoomName) openRoom(initialRoomName);
     const userId = localStorage.getItem("userId");
     if (!userId) localStorage.setItem("userId", getRandomId());
-    getUsersStatusOnServer();
-    window.addEventListener("beforeunload", onRoomLeave());
+    // getUsersStatusOnServer();
+    // setInterval(() => getUsersStatusOnServer(), 10000);
+    // window.addEventListener("beforeunload", onRoomLeave());
   }, []);
 
   return (
@@ -246,12 +247,22 @@ const MainPage = () => {
             Criar sala
           </Button>
         ) : (
-          <div
-            className="currentRoomCard"
-            onClick={() => document.getElementById}
+          <Button
+            variant="contained"
+            color="blue"
+            startIcon={
+              <WhatsappShareButton
+                id="shareButton"
+                className="inviteButton"
+                url={`https://master.d2eac7u7abqstu.amplifyapp.com/?initialRoomName=${roomName}`}
+              >
+                <WhatsappIcon size={24} round={true} />
+              </WhatsappShareButton>
+            }
+            onClick={() => document.getElementById("shareButton").click()}
           >
-            <ShareCardComponent text={"enviar convite"} roomName={roomName} />
-          </div>
+            Enviar convite
+          </Button>
         )}
       </div>
 
@@ -277,18 +288,21 @@ const MainPage = () => {
           <FiPhoneMissed />
         </IconButton>
       </ButtonGroup>
-      {/* {onlineRooms.length > 0 &&
-        onlineRooms.map((onlineRoom) => (
-          <div className="recentRoom">
-            {onlineRooms.users.map((user) => (
-              <div>user</div>
+      {/* {onlineRooms.length > 0 && (
+        <div className="recentRoomsListContainer">
+          <div> salas disponíveis </div>
+          <div className="recentRoomsList">
+            {onlineRooms.map((onlineRoom) => (
+              <div className="recentRoom">
+                <ShareCardComponent
+                  title={`sala com ${JSON.stringify(onlineRoom.users)}`}
+                  onClick={() => openRoom(onlineRoom.roomName)}
+                />
+              </div>
             ))}
-            <ShareCardComponent
-              roomName={onlineRoom.roomName}
-              onClick={() => openRoom(onlineRoom.roomName)}
-            />
           </div>
-        ))} */}
+        </div>
+      )} */}
       {/* {recentRooms && recentRooms.length > 0 && (
         <div className="recentRoomsListContainer">
           <div>últimos rolês visitados</div>

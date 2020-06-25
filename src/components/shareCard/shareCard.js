@@ -5,22 +5,24 @@ import Card from "@material-ui/core/Card";
 import { FiTrash2 } from "react-icons/fi";
 import "./shareCard.css";
 
-const ShareCardComponent = ({ text, roomName, onSwipe }) => {
+const ShareCardComponent = ({ title, message, onClick, onSwipe }) => {
   const share = () => {
     document.getElementById("shareButton").click();
   };
 
   const renderContent = () => (
     <Card>
-      <div className="container" onClick={share}>
-        <div className="title">{text || roomName}</div>
+      <div className="container" onClick={onClick || share}>
+        <div className="title">{title}</div>
         <div className="shareButton">
-          <WhatsappShareButton
-            id="shareButton"
-            url={`https://master.d2eac7u7abqstu.amplifyapp.com/?initialRoomName=${roomName}`}
-          >
-            <WhatsappIcon size={20} round={true} />
-          </WhatsappShareButton>
+          {message && (
+            <WhatsappShareButton
+              id="shareButton"
+              url={`https://master.d2eac7u7abqstu.amplifyapp.com/?initialRoomName=${message}`}
+            >
+              <WhatsappIcon size={20} round={true} />
+            </WhatsappShareButton>
+          )}
         </div>
       </div>
     </Card>

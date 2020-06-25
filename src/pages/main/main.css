@@ -1,5 +1,6 @@
 .header {
   z-index: 1;
+  background-color: white;
 }
 
 .headerFirstLine {
@@ -46,6 +47,11 @@
   display: flex;
   justify-content: center;
   margin: 20px 0 !important;
+}
+
+.inviteButton {
+  display: flex;
+  align-items: center;
 }
 
 .recentRoomsListContainer {
