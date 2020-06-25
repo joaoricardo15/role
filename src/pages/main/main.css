@@ -1,6 +1,5 @@
 .header {
   z-index: 1;
-  background-color: #f5f5f5;
 }
 
 .headerFirstLine {
@@ -28,7 +27,7 @@
 
 .noVideoImage {
   max-width: 40vh;
-  margin-top: 60px;
+  margin-top: 90px;
   animation: rotate 10s infinite linear;
 }
 
@@ -39,8 +38,10 @@
 }
 
 .noVideoTitle {
+  top: 60vh;
+  position: absolute;
+  width: 100%;
   text-align: center;
-  margin-top: 80px;
 }
 
 .roomButtonContainer {

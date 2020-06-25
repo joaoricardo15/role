@@ -14,6 +14,9 @@
 }
 
 .loadingTitle {
+  left: 0;
+  top: 60vh;
+  width: 100%;
+  position: absolute;
   text-align: center;
-  padding-top: 10px;
 }

@@ -73,7 +73,7 @@ export const VideoFrameComponent = ({
         },
       },
       interfaceConfigOverwrite: {
-        DEFAULT_BACKGROUND: "#f5f5f5",
+        DEFAULT_BACKGROUND: "white",
         DEFAULT_LOCAL_DISPLAY_NAME: "você",
         DEFAULT_REMOTE_DISPLAY_NAME: null,
         VIDEO_QUALITY_LABEL_DISABLED: true,

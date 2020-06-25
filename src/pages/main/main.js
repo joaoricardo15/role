@@ -30,6 +30,7 @@ import {
 } from "./../../components/videoFrame/videoFrame";
 //import ShareCardComponent from "../../components/shareCard/shareCard";
 import InstallCardComponent from "../../components/installCard/installCard";
+import noVideoAnimation from "./../../assets/astronaut.gif";
 import "./main.css";
 
 // const serverUserEndpoint = "http://localhost:1000/user";
@@ -226,9 +227,9 @@ const MainPage = () => {
             <div className="noVideoContainer">
               <img
                 className="noVideoImage"
-                src={process.env.PUBLIC_URL + "/logo.png"}
-                width="80%"
-                alt="logo"
+                src={noVideoAnimation}
+                width="50%"
+                alt="loading"
               />
               <div className="noVideoTitle">câmera desligada</div>
             </div>
