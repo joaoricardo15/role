@@ -12,6 +12,7 @@ export const VideoFrameComponent = ({
   roomName,
   onRoomEnter,
   onRoomLeave,
+  onShareScreen,
   camera,
   mic,
   onMuted,
@@ -72,7 +73,7 @@ export const VideoFrameComponent = ({
         },
       },
       interfaceConfigOverwrite: {
-        DEFAULT_BACKGROUND: "white",
+        DEFAULT_BACKGROUND: "#f5f5f5",
         DEFAULT_LOCAL_DISPLAY_NAME: "você",
         DEFAULT_REMOTE_DISPLAY_NAME: null,
         VIDEO_QUALITY_LABEL_DISABLED: true,
@@ -119,6 +120,9 @@ export const VideoFrameComponent = ({
     videoApi = new JitsiMeetExternalAPI(domain, options);
     videoApi.addEventListener("videoConferenceJoined", onJoined);
     videoApi.addEventListener("videoConferenceLeft", onRoomLeave);
+    videoApi.addEventListener("screenSharingStatusChanged", (payload) =>
+      onShareScreen(payload.on)
+    );
     videoApi.addEventListener("audioMuteStatusChanged", (payload) => {
       if (onMuted) onMuted(payload.muted);
     });

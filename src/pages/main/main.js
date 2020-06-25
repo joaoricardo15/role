@@ -10,10 +10,11 @@ import {
   FiMic,
   FiMicOff,
   FiPhoneMissed,
-  FiGrid,
-  FiMessageSquare,
+  //FiMessageSquare,
   FiPlayCircle,
   FiAtSign,
+  FiShare,
+  FiGrid,
 } from "react-icons/fi";
 import {
   IconButton,
@@ -35,9 +36,9 @@ import "./main.css";
 // const serverRoomEndpoint = "http://localhost:1000/rooms";
 
 const MainPage = () => {
-  const [mic, setMic] = useState(false);
+  const [mic, setMic] = useState(true);
   const [camera, setCamera] = useState(true);
-  const [viewMode, setViewMode] = useState(true);
+  const [shareScreen, setShareScreen] = useState(false);
   const [roomName, setRoomName] = useState(null);
 
   // const [loading, setLoading] = useState(false);
@@ -114,6 +115,10 @@ const MainPage = () => {
     onRoomLeave();
   };
 
+  const onShareScreen = (status) => {
+    setShareScreen(status);
+  };
+
   const onMuted = (muted) => {
     setMic(!muted);
   };
@@ -133,12 +138,15 @@ const MainPage = () => {
   };
 
   const toggleViewMode = () => {
-    setViewMode(!viewMode);
     if (videoApi) videoApi.executeCommand("toggleTileView");
   };
 
-  const toggleChat = () => {
-    if (videoApi) videoApi.executeCommand("toggleChat");
+  // const toggleChat = () => {
+  //   if (videoApi) videoApi.executeCommand("toggleChat");
+  // };
+
+  const toggleShateScreen = () => {
+    if (videoApi) videoApi.executeCommand("toggleShareScreen");
   };
 
   // const sendMessage = (message) => {
@@ -231,6 +239,7 @@ const MainPage = () => {
             onMuted={onMuted}
             onRoomEnter={onRoomEnter}
             onRoomLeave={onRoomLeave}
+            onShareScreen={onShareScreen}
             camera={camera}
             mic={mic}
           />
@@ -276,8 +285,16 @@ const MainPage = () => {
         <IconButton size="small" onClick={toggleViewMode} disabled={!roomName}>
           <FiGrid />
         </IconButton>
-        <IconButton size="small" onClick={toggleChat} disabled={!roomName}>
+        {/* <IconButton size="small" onClick={toggleChat} disabled={!roomName}>
           <FiMessageSquare />
+        </IconButton> */}
+        <IconButton
+          size="small"
+          color={shareScreen && "secondary"}
+          onClick={toggleShateScreen}
+          disabled={!roomName}
+        >
+          <FiShare />
         </IconButton>
         <IconButton
           size="small"
