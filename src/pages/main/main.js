@@ -258,11 +258,11 @@ const MainPage = () => {
         ) : (
           <Button
             variant="contained"
-            color="blue"
+            style={{ backgroundColor: "white" }}
             startIcon={
               <WhatsappShareButton
                 id="shareButton"
-                className="inviteButton"
+                className="inviteShareButton"
                 url={`https://injoy.chat/?initialRoomName=${roomName}`}
               >
                 <WhatsappIcon size={24} round={true} />
