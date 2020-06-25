@@ -22,17 +22,17 @@ import {
   ButtonGroup,
   Button,
 } from "@material-ui/core";
-import Axios from "axios";
+//import Axios from "axios";
 import {
   videoApi,
   VideoFrameComponent,
 } from "./../../components/videoFrame/videoFrame";
-import ShareCardComponent from "../../components/shareCard/shareCard";
+//import ShareCardComponent from "../../components/shareCard/shareCard";
 import InstallCardComponent from "../../components/installCard/installCard";
 import "./main.css";
 
-const serverUserEndpoint = "http://localhost:1000/user";
-const serverRoomEndpoint = "http://localhost:1000/rooms";
+// const serverUserEndpoint = "http://localhost:1000/user";
+// const serverRoomEndpoint = "http://localhost:1000/rooms";
 
 const MainPage = () => {
   const [mic, setMic] = useState(false);
@@ -42,7 +42,7 @@ const MainPage = () => {
 
   // const [loading, setLoading] = useState(false);
   // const [newRoomName, setNewRoomName] = useState("");
-  const [onlineRooms, setOnlineRooms] = useState([]);
+  //const [onlineRooms, setOnlineRooms] = useState([]);
   const [recentRooms, setRecentRooms] = useState(
     JSON.parse(localStorage.getItem("recentRooms"))
   );
@@ -86,19 +86,19 @@ const MainPage = () => {
     localStorage.setItem("recentRooms", JSON.stringify(updatedRecentRooms));
   };
 
-  const getUsersStatusOnServer = () => {
-    Axios.get(serverRoomEndpoint).then((response) =>
-      setOnlineRooms(response.data)
-    );
-  };
+  // const getUsersStatusOnServer = () => {
+  //   Axios.get(serverRoomEndpoint).then((response) =>
+  //     setOnlineRooms(response.data)
+  //   );
+  // };
 
-  const updateMyStatusOnServer = () => {
-    Axios.post(serverUserEndpoint, {
-      id: localStorage.getItem("userId"),
-      displayName: displayName,
-      roomName: roomName,
-    });
-  };
+  // const updateMyStatusOnServer = () => {
+  //   Axios.post(serverUserEndpoint, {
+  //     id: localStorage.getItem("userId"),
+  //     displayName: displayName,
+  //     roomName: roomName,
+  //   });
+  // };
 
   const onRoomEnter = () => {
     //updateMyStatusOnServer();
@@ -152,8 +152,7 @@ const MainPage = () => {
   // };
 
   useEffect(() => {
-    // alert(initialRoomName);
-    // console.log(initialRoomName);
+    ReactGA.initialize("UA-170290043-1");
     if (initialRoomName) openRoom(initialRoomName);
     const userId = localStorage.getItem("userId");
     if (!userId) localStorage.setItem("userId", getRandomId());

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Button, Typography } from "@material-ui/core";
+import { Button, Typography, IconButton } from "@material-ui/core";
 import Card from "@material-ui/core/Card";
-import { FiX, FiHeart } from "react-icons/fi";
+import { FaHeart } from "react-icons/fa";
+import { FiX } from "react-icons/fi";
 
 const InstallCardComponent = () => {
   const [installationEvent, setInstallationEvent] = useState(null);
@@ -52,9 +53,12 @@ const InstallCardComponent = () => {
           Tenha uma experiência mobile completa
         </Typography>
         <Button
-          color="primary"
           variant="outlined"
-          startIcon={<FiHeart />}
+          startIcon={
+            <IconButton size="small" color="secondary">
+              <FaHeart />
+            </IconButton>
+          }
           onClick={installApp}
         >
           Instalar
