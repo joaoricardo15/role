@@ -10,7 +10,8 @@ export let videoApi;
 
 export const VideoFrameComponent = ({
   roomName,
-  onLoad,
+  onRoomEnter,
+  onRoomLeave,
   camera,
   mic,
   onMuted,
@@ -20,7 +21,7 @@ export const VideoFrameComponent = ({
 
   const onJoined = () => {
     setLoading(false);
-    if (onLoad) onLoad();
+    if (onRoomEnter) onRoomEnter();
 
     // let iframe = document.querySelector("iframe");
     // const waterMark = iframe.getElementsByClassName("watermark")[0];
@@ -117,6 +118,7 @@ export const VideoFrameComponent = ({
     // eslint-disable-next-line no-undef
     videoApi = new JitsiMeetExternalAPI(domain, options);
     videoApi.addEventListener("videoConferenceJoined", onJoined);
+    videoApi.addEventListener("videoConferenceLeft", onRoomLeave);
     videoApi.addEventListener("audioMuteStatusChanged", (payload) => {
       if (onMuted) onMuted(payload.muted);
     });
