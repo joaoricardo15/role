@@ -1,5 +1,6 @@
 .header {
   z-index: 1;
+  background-color: white;
 }
 
 .headerFirstLine {
@@ -19,13 +20,20 @@
   height: 70vh;
 }
 
-.noVideoContainer {
+.noRoomContainer {
   width: 100%;
   display: inline-grid;
   justify-items: center;
 }
 
-.noVideoImage {
+.noRoomCamera {
+  max-width: 40vh;
+  margin-top: 90px;
+  border-radius: 40vh;
+  overflow: hidden;
+}
+
+.noRoomNoCameraImage {
   max-width: 40vh;
   margin-top: 90px;
   animation: rotate 10s infinite linear;
@@ -37,7 +45,7 @@
   }
 }
 
-.noVideoTitle {
+.noRoomnoCameraTitle {
   top: 60vh;
   position: absolute;
   width: 100%;

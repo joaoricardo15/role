@@ -24,7 +24,6 @@ import {
   ButtonGroup,
   Button,
 } from "@material-ui/core";
-//import Axios from "axios";
 import { w3cwebsocket } from "websocket";
 import {
   videoApi,
@@ -35,8 +34,6 @@ import InstallCardComponent from "../../components/installCard/installCard";
 import noVideoAnimation from "./../../assets/astronaut.gif";
 import "./main.css";
 
-// const serverUserEndpoint = "http://localhost:1000/user";
-// const serverRoomEndpoint = "http://localhost:1000/rooms";
 let websocketClient;
 const serverUrl = "ws://localhost:1000";
 
@@ -45,9 +42,6 @@ const MainPage = () => {
   const [camera, setCamera] = useState(true);
   const [shareScreen, setShareScreen] = useState(false);
   const [roomName, setRoomName] = useState(null);
-
-  // const [loading, setLoading] = useState(false);
-  // const [newRoomName, setNewRoomName] = useState("");
   const [onlineRooms, setOnlineRooms] = useState([]);
   const [recentRooms, setRecentRooms] = useState(
     JSON.parse(localStorage.getItem("recentRooms"))
@@ -64,12 +58,6 @@ const MainPage = () => {
     setDisplayName(name);
     if (videoApi) videoApi.executeCommand("displayName", name);
   };
-
-  // const deleteFromRecentRooms = (roomName) => {
-  //   const updatetRecentRooms = recentRooms.filter((x) => x !== roomName);
-  //   setRecentRooms(updatetRecentRooms);
-  //   localStorage.setItem("recentRooms", JSON.stringify(updatetRecentRooms));
-  // };
 
   const openRoom = (roomName) => {
     setRoomName(roomName);
@@ -91,35 +79,24 @@ const MainPage = () => {
     localStorage.setItem("recentRooms", JSON.stringify(updatedRecentRooms));
   };
 
-  // const getUsersStatusOnServer = () => {
-  //   Axios.get(serverRoomEndpoint).then((response) =>
-  //     setOnlineRooms(response.data)
-  //   );
-  // };
-
-  const updateMyStatusOnServer = () => {
-    if (websocketClient.readyState === websocketClient.OPEN) {
-      websocketClient.send(
-        JSON.stringify({
-          id: localStorage.getItem("userId"),
-          displayName: displayName,
-          roomName: roomName,
-        })
-      );
-    }
-    // Axios.post(serverUserEndpoint, {
-    //   id: localStorage.getItem("userId"),
-    //   displayName: displayName,
-    //   roomName: roomName,
-    // });
+  const updateMyStatusOnServer = (displayName, roomName) => {
+    // if (websocketClient.readyState === websocketClient.OPEN) {
+    //   websocketClient.send(
+    //     JSON.stringify({
+    //       id: localStorage.getItem("userId"),
+    //       displayName: displayName,
+    //       roomName: roomName,
+    //     })
+    //   );
+    // }
   };
 
   const onRoomEnter = () => {
-    //updateMyStatusOnServer();
+    updateMyStatusOnServer(displayName, roomName);
   };
 
   const onRoomLeave = () => {
-    //updateMyStatusOnServer();
+    updateMyStatusOnServer(displayName, null);
   };
 
   const hangUp = () => {
@@ -171,16 +148,9 @@ const MainPage = () => {
 
     websocketClient.onopen = () => {
       websocketClient.onmessage = (message) => {
-        alert(JSON.stringify(message));
+        setOnlineRooms(JSON.parse(message.data));
       };
     };
-
-    //onServerUpdate;
-  };
-
-  const onServerUpdate = (message) => {
-    const payload = JSON.parse(message);
-    if (payload.onlineRooms) setOnlineRooms(payload.onlineRooms);
   };
 
   // const sendMessage = (message) => {
@@ -198,9 +168,6 @@ const MainPage = () => {
     if (initialRoomName) openRoom(initialRoomName);
     const userId = localStorage.getItem("userId");
     if (!userId) localStorage.setItem("userId", getRandomId());
-    // getUsersStatusOnServer();
-    // setInterval(() => getUsersStatusOnServer(), 10000);
-    // window.addEventListener("beforeunload", onRoomLeave());
     //startServerConnection();
   }, []);
 
@@ -226,48 +193,28 @@ const MainPage = () => {
                 />
               </div>
             </div>
-            {/* {!loading && !roomName && (
-              <div className="newRoomContainer">
-                <Chip
-                    clickable
-                    color="primary"
-                    label="Rolê aleatório"
-                    onClick={() => openRoom(getRandomRoom())}
-                    deleteIcon={<FiPlayCircle />}
-                    onDelete={null}
-                    variant="outlined"
-                  />
-                <div className="createRoomContainer">
-                  <TextField
-                    value={newRoomName}
-                    className="createRoomInput"
-                    placeholder="novo rolê"
-                    onChange={(e) => setNewRoomName(e.target.value)}
-                  />
-                  <div className="newRoomIcon" onClick={onCreateRoom}>
-                    <FiPlusCircle />
-                  </div>
-                </div>
-              </div>
-            )} */}
           </div>
         )}
       </Sticky>
       <div className="videoContainer">
         {!roomName ? (
-          camera ? (
-            <Webcam audio={false} height="100%" width="100%" mirrored />
-          ) : (
-            <div className="noVideoContainer">
+          <div className="noRoomContainer">
+            {camera ? (
+              <div className="noRoomCamera">
+                <Webcam audio={true} width="100%" height="100%" mirrored />
+              </div>
+            ) : (
               <img
-                className="noVideoImage"
+                className="noRoomNoCameraImage"
                 src={noVideoAnimation}
                 width="50%"
                 alt="loading"
               />
-              <div className="noVideoTitle">câmera desligada</div>
+            )}
+            <div className="noRoomnoCameraTitle">
+              você ainda não está conectado
             </div>
-          )
+          </div>
         ) : (
           <VideoFrameComponent
             roomName={roomName}
@@ -309,7 +256,6 @@ const MainPage = () => {
           </Button>
         )}
       </div>
-
       <ButtonGroup style={{ width: "100%", justifyContent: "center" }}>
         <IconButton onClick={toggleCamera}>
           {camera ? <FiVideo /> : <FiVideoOff />}
@@ -342,7 +288,7 @@ const MainPage = () => {
           <FiPhoneMissed />
         </IconButton>
       </ButtonGroup>
-      {onlineRooms.length > 0 && (
+      {onlineRooms.length > 0 && !(roomName && onlineRooms.length === 1) && (
         <div className="recentRoomsListContainer">
           <div> salas disponíveis </div>
           <div className="recentRoomsList">
@@ -357,22 +303,6 @@ const MainPage = () => {
           </div>
         </div>
       )}
-      {/* {recentRooms && recentRooms.length > 0 && (
-        <div className="recentRoomsListContainer">
-          <div>últimos rolês visitados</div>
-          <div className="recentRoomsList">
-            {recentRooms.map((recentRoomName, index) => (
-              <div className="recentRoom">
-                <ShareCardComponent
-                  roomName={recentRoomName}
-                  onClick={() => openRoom(recentRoomName)}
-                  onSwipe={() => deleteFromRecentRooms(recentRoomName)}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )} */}
       <InstallCardComponent />
     </StickyContainer>
   );
