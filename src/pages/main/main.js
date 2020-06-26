@@ -230,6 +230,7 @@ const MainPage = () => {
       <div className="roomButtonContainer">
         {!roomName ? (
           <Button
+            size="small"
             color="secondary"
             variant="contained"
             startIcon={<FiPlayCircle />}
@@ -239,6 +240,7 @@ const MainPage = () => {
           </Button>
         ) : (
           <Button
+            size="small"
             variant="contained"
             style={{ backgroundColor: "white" }}
             startIcon={
@@ -247,12 +249,12 @@ const MainPage = () => {
                 className="inviteShareButton"
                 url={`https://www.injoy.chat/?initialRoomName=${roomName}`}
               >
-                <WhatsappIcon size={24} round={true} />
+                <WhatsappIcon size={20} round={true} />
               </WhatsappShareButton>
             }
             onClick={() => document.getElementById("shareButton").click()}
           >
-            Convidar para sala
+            Convidar amigos
           </Button>
         )}
       </div>

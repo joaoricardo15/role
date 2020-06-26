@@ -27,9 +27,9 @@
 }
 
 .noRoomCameraContainer {
+  width: 30vh;
   height: 30vh;
-  max-width: 30vh;
-  margin-top: 90px;
+  margin-top: 10vh;
   border-radius: 15vh;
   overflow: hidden;
 }
@@ -41,8 +41,9 @@
 }
 
 .noRoomNoCameraImage {
-  max-width: 40vh;
-  margin-top: 90px;
+  width: 30vh;
+  height: 30vh;
+  margin-top: 10vh;
   animation: rotate 10s infinite linear;
 }
 
@@ -62,7 +63,7 @@
 .roomButtonContainer {
   display: flex;
   justify-content: center;
-  margin: 20px 0 !important;
+  margin: 10px 0 !important;
 }
 
 .inviteShareButton {
