@@ -17,6 +17,7 @@ import {
   FiShare,
   FiGrid,
 } from "react-icons/fi";
+import { IoLogoWhatsapp } from "react-icons/io";
 import {
   IconButton,
   TextField,
@@ -37,7 +38,8 @@ import axios from "axios";
 
 let websocketClient;
 const serverUrl = "ws://localhost:1000";
-const serverInjoy = "3.222.37.48";
+const serverInjoy =
+  "//Injoyserver-env.x2mviib6hg.us-east-1.elasticbeanstalk.com";
 
 const MainPage = () => {
   const [mic, setMic] = useState(true);
@@ -173,7 +175,7 @@ const MainPage = () => {
     //startServerConnection();
 
     axios.get(`http://${serverInjoy}/users`).then((response) => {
-      alert(JSON.stringify(response.data[0]));
+      console.log(JSON.stringify(response.data[0]));
     });
   }, []);
 
@@ -248,7 +250,7 @@ const MainPage = () => {
           <Button
             size="small"
             variant="contained"
-            style={{ backgroundColor: "white" }}
+            style={{ backgroundColor: "#25D365", color: "white" }}
             startIcon={
               <WhatsappShareButton
                 id="shareButton"
