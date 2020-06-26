@@ -55,7 +55,7 @@ export const VideoFrameComponent = ({
         subject: " ", // hide room name
         noSSL: true,
         resolution: 240,
-        defaultLanguage: "es",
+        defaultLanguage: "en",
         enableClosePage: false,
         enableWelcomePage: false,
         disableDeepLinking: true,
