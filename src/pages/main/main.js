@@ -212,7 +212,7 @@ const MainPage = () => {
               />
             )}
             <div className="noRoomnoCameraTitle">
-              você ainda não se conectou à uma sala
+              você não está conectado à uma sala
             </div>
           </div>
         ) : (
@@ -252,7 +252,7 @@ const MainPage = () => {
             }
             onClick={() => document.getElementById("shareButton").click()}
           >
-            Enviar convite
+            Convidar para sala
           </Button>
         )}
       </div>
