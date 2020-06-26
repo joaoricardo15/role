@@ -33,9 +33,11 @@ import ShareCardComponent from "../../components/shareCard/shareCard";
 import InstallCardComponent from "../../components/installCard/installCard";
 import noVideoAnimation from "./../../assets/astronaut.gif";
 import "./main.css";
+import axios from "axios";
 
 let websocketClient;
 const serverUrl = "ws://localhost:1000";
+const serverInjoy = "3.222.37.48";
 
 const MainPage = () => {
   const [mic, setMic] = useState(true);
@@ -169,6 +171,10 @@ const MainPage = () => {
     const userId = localStorage.getItem("userId");
     if (!userId) localStorage.setItem("userId", getRandomId());
     //startServerConnection();
+
+    axios.get(`http://${serverInjoy}/users`).then((response) => {
+      alert(JSON.stringify(response.data[0]));
+    });
   }, []);
 
   return (
