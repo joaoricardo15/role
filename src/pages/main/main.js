@@ -200,8 +200,8 @@ const MainPage = () => {
         {!roomName ? (
           <div className="noRoomContainer">
             {camera ? (
-              <div className="noRoomCamera">
-                <Webcam audio={true} width="100%" height="100%" mirrored />
+              <div className="noRoomCameraContainer">
+                <Webcam audio={true} className="noRoomCamera" mirrored />
               </div>
             ) : (
               <img
@@ -212,7 +212,7 @@ const MainPage = () => {
               />
             )}
             <div className="noRoomnoCameraTitle">
-              você ainda não está conectado
+              você ainda não se conectou à uma sala
             </div>
           </div>
         ) : (
