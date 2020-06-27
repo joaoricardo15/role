@@ -17,7 +17,6 @@ import {
   FiShare,
   FiGrid,
 } from "react-icons/fi";
-import { IoLogoWhatsapp } from "react-icons/io";
 import {
   IconButton,
   TextField,
@@ -37,62 +36,32 @@ import "./main.css";
 import axios from "axios";
 
 let websocketClient;
-const serverUrl = "ws://localhost:1000";
-const serverInjoy =
-  "//Injoyserver-env.x2mviib6hg.us-east-1.elasticbeanstalk.com";
+//const serverUrl = "ws://localhost:1000";
+//const serverUrl = "ws://Injoyserver-env.x2mviib6hg.us-east-1.elasticbeanstalk.com";
+const serverUrl = "wss://18b0p3qzk7.execute-api.us-east-1.amazonaws.com/beta";
 
 const MainPage = () => {
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
   const [mic, setMic] = useState(true);
   const [camera, setCamera] = useState(true);
   const [shareScreen, setShareScreen] = useState(false);
-  const [roomName, setRoomName] = useState(null);
+  const [roomName, setRoomName] = useState("");
   const [onlineRooms, setOnlineRooms] = useState([]);
-  const [recentRooms, setRecentRooms] = useState(
-    JSON.parse(localStorage.getItem("recentRooms"))
-  );
   const [displayName, setDisplayName] = useState(
     localStorage.getItem("displayName")
   );
-  const initialRoomName = new URLSearchParams(useLocation().search).get(
-    "initialRoomName"
-  );
+  const initialRoomName =
+    new URLSearchParams(useLocation().search).get("initialRoomName") || "";
 
   const onNameChange = (name) => {
-    localStorage.setItem("displayName", name);
+    localStorage.setItem("displayName", name || "");
     setDisplayName(name);
     if (videoApi) videoApi.executeCommand("displayName", name);
   };
 
   const openRoom = (roomName) => {
     setRoomName(roomName);
-    updateRecentRooms(roomName);
     ReactGA.pageview(roomName);
-  };
-
-  const updateRecentRooms = (roomName) => {
-    let updatedRecentRooms;
-    if (recentRooms && recentRooms.length > 0) {
-      for (var i = 0; i < recentRooms.length; i++)
-        if (recentRooms[i] === roomName) recentRooms.splice(i, 1);
-      recentRooms.splice(0, 0, roomName);
-      updatedRecentRooms = recentRooms;
-    } else {
-      updatedRecentRooms = [roomName];
-    }
-    setRecentRooms(updatedRecentRooms);
-    localStorage.setItem("recentRooms", JSON.stringify(updatedRecentRooms));
-  };
-
-  const updateMyStatusOnServer = (displayName, roomName) => {
-    // if (websocketClient.readyState === websocketClient.OPEN) {
-    //   websocketClient.send(
-    //     JSON.stringify({
-    //       id: localStorage.getItem("userId"),
-    //       displayName: displayName,
-    //       roomName: roomName,
-    //     })
-    //   );
-    // }
   };
 
   const onRoomEnter = () => {
@@ -100,7 +69,7 @@ const MainPage = () => {
   };
 
   const onRoomLeave = () => {
-    updateMyStatusOnServer(displayName, null);
+    updateMyStatusOnServer(displayName, "");
   };
 
   const hangUp = () => {
@@ -143,18 +112,32 @@ const MainPage = () => {
     if (videoApi) videoApi.executeCommand("toggleShareScreen");
   };
 
-  const startServerConnection = () => {
+  const startServerConnection = (userId) => {
     websocketClient = new w3cwebsocket(
-      `${serverUrl}/user/?id=${localStorage.getItem(
-        "userId"
-      )}&displayName=${displayName}&roomName=${initialRoomName}`
+      `${serverUrl}/?id=${userId}&displayName=${displayName}&roomName=${initialRoomName}`
     );
 
-    websocketClient.onopen = () => {
-      websocketClient.onmessage = (message) => {
-        setOnlineRooms(JSON.parse(message.data));
-      };
-    };
+    // websocketClient.onopen = () => {
+    //   websocketClient.onmessage = (message) => {
+    //     alert(message.data);
+    //     //setOnlineRooms(JSON.parse(message.data));
+    //   };
+    // };
+  };
+
+  const updateMyStatusOnServer = (displayName, roomName) => {
+    if (websocketClient.readyState === websocketClient.OPEN) {
+      websocketClient.send(
+        JSON.stringify({
+          action: "onMessage",
+          data: {
+            id: userId,
+            displayName: displayName,
+            roomName: roomName,
+          },
+        })
+      );
+    }
   };
 
   // const sendMessage = (message) => {
@@ -169,14 +152,17 @@ const MainPage = () => {
 
   useEffect(() => {
     ReactGA.initialize("UA-170290043-1");
+    let updatedUserId = userId;
+    if (!updatedUserId) {
+      updatedUserId = getRandomId();
+      localStorage.setItem("userId", updatedUserId);
+      setUserId(updatedUserId);
+    }
+    startServerConnection(updatedUserId);
     if (initialRoomName) openRoom(initialRoomName);
-    const userId = localStorage.getItem("userId");
-    if (!userId) localStorage.setItem("userId", getRandomId());
-    //startServerConnection();
-
-    axios.get(`http://${serverInjoy}/users`).then((response) => {
-      console.log(JSON.stringify(response.data[0]));
-    });
+    // axios.get(`http://${serverInjoy}/users`).then((response) => {
+    //   console.log(JSON.stringify(response.data[0]));
+    // });
   }, []);
 
   return (
