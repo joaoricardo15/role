@@ -267,15 +267,17 @@ const MainPage = () => {
             </div>
           </div>
         ) : (
-          <VideoFrameComponent
-            roomName={roomName}
-            onMuted={onMuted}
-            onRoomEnter={onRoomEnter}
-            onRoomLeave={onRoomLeave}
-            onShareScreen={onShareScreen}
-            camera={camera}
-            mic={mic}
-          />
+          <div className="RoomContainer">
+            <VideoFrameComponent
+              roomName={roomName}
+              onMuted={onMuted}
+              onRoomEnter={onRoomEnter}
+              onRoomLeave={onRoomLeave}
+              onShareScreen={onShareScreen}
+              camera={camera}
+              mic={mic}
+            />
+          </div>
         )}
       </div>
       <div className="roomButtonContainer">
@@ -309,23 +311,29 @@ const MainPage = () => {
           </Button>
         )}
       </div>
-      <ButtonGroup style={{ width: "100%", justifyContent: "center" }}>
-        <IconButton onClick={toggleCamera}>
+      <ButtonGroup className="controlPanel">
+        <IconButton onClick={toggleCamera} className="controlPanelButton">
           {camera ? <FiVideo /> : <FiVideoOff />}
         </IconButton>
         <IconButton onClick={toggleMic}>
           {mic ? <FiMic /> : <FiMicOff />}
         </IconButton>
-        <IconButton size="small" onClick={toggleViewMode} disabled={!roomName}>
+        <IconButton
+          size="small"
+          onClick={toggleViewMode}
+          disabled={!roomName}
+          className="controlPanelButton"
+        >
           <FiGrid />
         </IconButton>
-        {/* <IconButton size="small" onClick={toggleChat} disabled={!roomName}>
+        {/* <IconButton size="small" onClick={toggleChat} disabled={!roomName} className="controlPanelButton" >
           <FiMessageSquare />
         </IconButton> */}
         {!isMobile && (
           <IconButton
             size="small"
             color={shareScreen && "secondary"}
+            className="controlPanelButton"
             onClick={toggleShateScreen}
             disabled={!roomName}
           >
@@ -335,6 +343,7 @@ const MainPage = () => {
         <IconButton
           size="small"
           color="secondary"
+          className="controlPanelButton"
           onClick={hangUp}
           disabled={!roomName}
         >

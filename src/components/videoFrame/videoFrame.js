@@ -84,8 +84,8 @@ export const VideoFrameComponent = ({
           // "hangup",
           // "camera",
           // "microphone",
+          // "tileview",
           // "fullscreen",
-          // "microphone",
           // "closedcaptions",
           // "desktop",
           // "fullscreen",
@@ -103,7 +103,6 @@ export const VideoFrameComponent = ({
           // "feedback",
           // "stats",
           // "shortcuts",
-          // "tileview",
           // "videobackgroundblur",
           // "download",
           // "help",
@@ -119,6 +118,7 @@ export const VideoFrameComponent = ({
     videoApi = new JitsiMeetExternalAPI(domain, options);
     videoApi.addEventListener("videoConferenceJoined", onJoined);
     videoApi.addEventListener("videoConferenceLeft", onRoomLeave);
+
     videoApi.addEventListener("screenSharingStatusChanged", (payload) =>
       onShareScreen(payload.on)
     );

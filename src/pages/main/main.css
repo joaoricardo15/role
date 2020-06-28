@@ -31,6 +31,22 @@
   height: 70vh;
 }
 
+.roomButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: -40px;
+}
+
+.controlPanel {
+  width: 100%;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.controlPanelButton {
+  padding: 0 20px !important;
+}
+
 .noRoomContainer {
   width: 100%;
   display: inline-grid;
@@ -69,12 +85,6 @@
   position: absolute;
   width: 100%;
   text-align: center;
-}
-
-.roomButtonContainer {
-  display: flex;
-  justify-content: center;
-  margin: 10px 0 !important;
 }
 
 .inviteShareButton {
