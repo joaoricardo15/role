@@ -23,21 +23,19 @@ import {
   InputAdornment,
   ButtonGroup,
   Button,
+  Card,
 } from "@material-ui/core";
 import { w3cwebsocket } from "websocket";
 import {
   videoApi,
   VideoFrameComponent,
 } from "./../../components/videoFrame/videoFrame";
-import ShareCardComponent from "../../components/shareCard/shareCard";
 import InstallCardComponent from "../../components/installCard/installCard";
 import noVideoAnimation from "./../../assets/astronaut.gif";
 import "./main.css";
-import axios from "axios";
 
 let websocketClient;
 //const serverUrl = "ws://localhost:1000";
-//const serverUrl = "ws://Injoyserver-env.x2mviib6hg.us-east-1.elasticbeanstalk.com";
 const serverUrl = "wss://18b0p3qzk7.execute-api.us-east-1.amazonaws.com/beta";
 
 const MainPage = () => {
@@ -46,7 +44,9 @@ const MainPage = () => {
   const [camera, setCamera] = useState(true);
   const [shareScreen, setShareScreen] = useState(false);
   const [roomName, setRoomName] = useState("");
+  const [roomAlias, setRoomAlias] = useState("");
   const [onlineRooms, setOnlineRooms] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const [displayName, setDisplayName] = useState(
     localStorage.getItem("displayName")
   );
@@ -60,16 +60,17 @@ const MainPage = () => {
   };
 
   const openRoom = (roomName) => {
+    setRoomAlias("");
     setRoomName(roomName);
     ReactGA.pageview(roomName);
   };
 
   const onRoomEnter = () => {
-    updateMyStatusOnServer(displayName, roomName);
+    updateMyStatus(displayName, roomName);
   };
 
   const onRoomLeave = () => {
-    updateMyStatusOnServer(displayName, "");
+    updateMyStatus(displayName, "");
   };
 
   const hangUp = () => {
@@ -117,23 +118,56 @@ const MainPage = () => {
       `${serverUrl}/?id=${userId}&displayName=${displayName}&roomName=${initialRoomName}`
     );
 
-    // websocketClient.onopen = () => {
-    //   websocketClient.onmessage = (message) => {
-    //     alert(message.data);
-    //     //setOnlineRooms(JSON.parse(message.data));
-    //   };
-    // };
+    websocketClient.onmessage = (message) => {
+      const payload = JSON.parse(message.data);
+      if (payload.newRoomName) setRoomAlias(payload.newRoomName);
+
+      if (payload.onlineUsers) setOnlineUsers(payload.onlineUsers);
+      if (payload.onlineRooms) {
+        setOnlineRooms(payload.onlineRooms);
+
+        const currentRoom = roomName || initialRoomName;
+        if (currentRoom) {
+          const myRoomOnOnlineRoomsIndex = payload.onlineRooms.findIndex(
+            (x) => x.roomName === currentRoom
+          );
+          if (
+            myRoomOnOnlineRoomsIndex > -1 &&
+            payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias !==
+              roomAlias
+          )
+            setRoomAlias(
+              payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias
+            );
+        }
+      }
+    };
   };
 
-  const updateMyStatusOnServer = (displayName, roomName) => {
+  const updateMyStatus = (displayName, roomName) => {
     if (websocketClient.readyState === websocketClient.OPEN) {
       websocketClient.send(
         JSON.stringify({
-          action: "onMessage",
+          action: "onRoomChange",
           data: {
             id: userId,
             displayName: displayName,
             roomName: roomName,
+          },
+        })
+      );
+    }
+  };
+
+  const changeRoomName = (displayName, roomName, newRooName) => {
+    if (websocketClient.readyState === websocketClient.OPEN) {
+      websocketClient.send(
+        JSON.stringify({
+          action: "onRoomNameChange",
+          data: {
+            displayName: displayName,
+            roomName: roomName,
+            newRoomName: newRooName,
           },
         })
       );
@@ -160,9 +194,6 @@ const MainPage = () => {
     }
     startServerConnection(updatedUserId);
     if (initialRoomName) openRoom(initialRoomName);
-    // axios.get(`http://${serverInjoy}/users`).then((response) => {
-    //   console.log(JSON.stringify(response.data[0]));
-    // });
   }, []);
 
   return (
@@ -186,6 +217,32 @@ const MainPage = () => {
                   }}
                 />
               </div>
+              {roomName && (
+                <div className="currentRoomName">
+                  <TextField
+                    color="secondary"
+                    value={roomAlias}
+                    placeholder="nome da sala"
+                    inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    onChange={(e) => setRoomAlias(e.target.value)}
+                    onBlur={() =>
+                      changeRoomName(displayName, roomName, roomAlias)
+                    }
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <img
+                            className="currentRoomImage"
+                            src={process.env.PUBLIC_URL + "logo.png"}
+                            width="20"
+                            alt="loading"
+                          />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -284,21 +341,53 @@ const MainPage = () => {
           <FiPhoneMissed />
         </IconButton>
       </ButtonGroup>
-      {onlineRooms.length > 0 && !(roomName && onlineRooms.length === 1) && (
-        <div className="recentRoomsListContainer">
-          <div> salas disponíveis </div>
-          <div className="recentRoomsList">
-            {onlineRooms.map((onlineRoom) => (
-              <div className="recentRoom">
-                <ShareCardComponent
-                  title={`sala com ${JSON.stringify(onlineRoom.users)}`}
-                  onClick={() => openRoom(onlineRoom.roomName)}
-                />
-              </div>
-            ))}
+      {onlineRooms.length > 0 &&
+        !(onlineRooms.length === 1 && onlineRooms[0].roomName === roomName) && (
+          <div className="onlineRoomsListContainer">
+            <div className="onlineRoomsListTitleContainer">
+              <img
+                className="currentRoomImage"
+                src={process.env.PUBLIC_URL + "logo.png"}
+                width="20"
+                alt="loading"
+              />
+              <div className="onlineRoomsListTitle"> salas online </div>
+            </div>
+            <div className="onlineRoomsList">
+              {onlineRooms.map(
+                (onlineRoom) =>
+                  onlineRoom.roomName !== roomName && (
+                    <Card style={{ marginTop: 10 }}>
+                      <div
+                        className="onlineRoom"
+                        onClick={() => openRoom(onlineRoom.roomName)}
+                      >
+                        <div className="onlineRoomNameContainer">
+                          <div className="onlineRoomName">
+                            {onlineRoom.roomAlias || "sala sem nome"}
+                          </div>
+                        </div>
+                        <div className="onlineRoomUsersList">
+                          {onlineRoom.users.map((onlineUser, index) => (
+                            <div className="onlineRoomUserName">
+                              {`${index === 0 ? "" : ", "}@${
+                                onlineUser.displayName || "sem nome"
+                              }`}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </Card>
+                  )
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      {/* <div>
+          {onlineUsers.map((onlineUser) => (
+            <div>{onlineUser.displayName} </div>
+          ))}
+        </div> */}
       <InstallCardComponent />
     </StickyContainer>
   );

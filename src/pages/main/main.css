@@ -13,6 +13,17 @@
 
 .greetings {
   width: 35%;
+  display: flex;
+}
+
+.currentRoomImage {
+  animation: rotate 10s infinite linear;
+}
+
+.currentRoomName {
+  width: 40%;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .videoContainer {
@@ -71,18 +82,61 @@
   align-items: center;
 }
 
-.recentRoomsListContainer {
+.onlineRoomsListContainer {
   margin: 10px;
 }
 
-.recentRoomsList {
+.onlineRoomsListTitleContainer {
+  display: flex;
+  align-items: center;
+  margin-left: 5px;
+}
+
+.onlineRoomsListTitle {
+  font-size: 12px;
+  font-weight: 800;
+  color: #323232;
+  margin-left: 5px;
+}
+
+.onlineRoomsList {
   display: flex;
   flex-direction: column;
   margin-top: 5px;
 }
 
-.recentRoom {
-  width: 100%;
-  margin-bottom: 5px;
+.onlineRoom {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background-color: white;
+  padding: 0 5px;
+  margin: 5px 0;
+}
+
+.onlineRoomNameContainer {
+  display: flex;
+  max-width: 45%;
+}
+
+.onlineRoomName {
+  font-size: 15px;
+  font-weight: 600;
+  color: #424242;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.onlineRoomUsersList {
+  display: flex;
+  max-width: 50%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.onlineRoomUserName {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
