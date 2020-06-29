@@ -9,37 +9,22 @@ const parentNode = "jitsiContainer";
 export let videoApi;
 
 export const VideoFrameComponent = ({
-  roomName,
-  onRoomEnter,
-  onRoomLeave,
-  onShareScreen,
-  camera,
   mic,
-  onMuted,
+  camera,
+  roomName,
+  onRoomLeave,
+  onRoomEntered,
+  onMicStatusChanged,
+  onVideoStatusChanged,
+  onTileviewStatusChanged,
+  onShareScreenStatusChanged,
 }) => {
   const [loading, setLoading] = useState(true);
   const displayName = localStorage.getItem("displayName");
 
-  const onJoined = () => {
+  const onRoomEnter = () => {
     setLoading(false);
-    if (onRoomEnter) onRoomEnter();
-
-    // let iframe = document.querySelector("iframe");
-    // const waterMark = iframe.getElementsByClassName("watermark")[0];
-    // if (waterMark) waterMark.style.display = "none";
-    //document.body.requestFullscreen();
-
-    //const iframe = document.getElementById("jitsiConferenceFrame0");
-    // const iframeDom = iframe.contentDocument || iframe.contentWindow.document;
-    // const elmnt = iframeDom.getElementsByClassName("watermark")[0];
-    // elmnt.style.display = "none";
-
-    // var el = document.getElementById("iframeId").contentWindow.document;
-
-    // setTimeout(() => {
-    //   const waterMark = document.getElementsByClassName("watermark")[0];
-    //   if (waterMark) waterMark.style.display = "none";
-    // }, 1000);
+    onRoomEntered();
   };
 
   useEffect(() => {
@@ -116,23 +101,28 @@ export const VideoFrameComponent = ({
     };
     // eslint-disable-next-line no-undef
     videoApi = new JitsiMeetExternalAPI(domain, options);
-    videoApi.addEventListener("videoConferenceJoined", onJoined);
-    videoApi.addEventListener("videoConferenceLeft", onRoomLeave);
+    videoApi.addEventListeners({
+      videoConferenceJoined: onRoomEnter,
+      videoConferenceLeft: onRoomLeave,
+      videoAvailabilityChanged: (payload) =>
+        onVideoStatusChanged(payload.available),
+      audioAvailabilityChanged: (payload) =>
+        onMicStatusChanged(payload.available),
+      videoMuteStatusChanged: (payload) => onMicStatusChanged(!payload.muted),
+      audioMuteStatusChanged: (payload) => onMicStatusChanged(!payload.muted),
+      screenSharingStatusChanged: (payload) =>
+        onShareScreenStatusChanged(payload.on),
+      tileViewChanged: (payload) => onTileviewStatusChanged(payload.enabled),
+    });
+    // videoApi.addEventListener("incomingMessage", (payload) => {
+    //   alert("in: " + payload.message);
+    // });
+    // videoApi.addEventListener("outgoingMessage", (payload) => {
+    //   alert("out: " + payload.message);
+    //   videoApi.executeCommand("sendEndpointTextMessage", "", payload.message);
+    // });
+    //videoApi.executeCommand("avatarUrl", "./logo.png");
 
-    videoApi.addEventListener("screenSharingStatusChanged", (payload) =>
-      onShareScreen(payload.on)
-    );
-    videoApi.addEventListener("audioMuteStatusChanged", (payload) => {
-      if (onMuted) onMuted(payload.muted);
-    });
-    videoApi.addEventListener("incomingMessage", (payload) => {
-      alert("in: " + payload.message);
-    });
-    videoApi.addEventListener("outgoingMessage", (payload) => {
-      alert("out: " + payload.message);
-      videoApi.executeCommand("sendEndpointTextMessage", "", payload.message);
-    });
-    videoApi.executeCommand("avatarUrl", "./logo.png");
     if (!camera) videoApi.executeCommand("toggleVideo");
     if (!mic) videoApi.executeCommand("toggleAudio");
   }, [roomName]);

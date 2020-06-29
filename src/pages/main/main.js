@@ -16,6 +16,7 @@ import {
   FiAtSign,
   FiShare,
   FiGrid,
+  FiSquare,
 } from "react-icons/fi";
 import {
   IconButton,
@@ -39,79 +40,88 @@ let websocketClient;
 const serverUrl = "wss://18b0p3qzk7.execute-api.us-east-1.amazonaws.com/beta";
 
 const MainPage = () => {
-  const [userId, setUserId] = useState(localStorage.getItem("userId"));
-  const [mic, setMic] = useState(true);
-  const [camera, setCamera] = useState(true);
-  const [shareScreen, setShareScreen] = useState(false);
-  const [roomName, setRoomName] = useState("");
-  const [roomAlias, setRoomAlias] = useState("");
+  const [micStatus, setMicStatus] = useState(true);
+  const [videoStatus, setVideoStatus] = useState(true);
+  const [titleviewStatus, setTitleviewStatus] = useState(false);
+  const [shareScreenStatus, setShareScreenStatus] = useState(false);
+  const [currentRoomName, setCurrentRoomName] = useState("");
+  const [currentRoomAlias, setCurrentRoomAlias] = useState("");
+  const [isRoomLoading, setIsRoomLoading] = useState(false);
   const [onlineRooms, setOnlineRooms] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
   const [displayName, setDisplayName] = useState(
     localStorage.getItem("displayName")
   );
   const initialRoomName =
     new URLSearchParams(useLocation().search).get("initialRoomName") || "";
 
-  const onNameChange = (name) => {
+  const enterRoom = (roomName) => {
+    setIsRoomLoading(true);
+    setCurrentRoomAlias("");
+    setCurrentRoomName(roomName);
+    ReactGA.pageview(roomName);
+  };
+
+  const leaveRoom = () => {
+    if (videoApi) videoApi.dispose();
+    setCurrentRoomName("");
+    setTitleviewStatus(false);
+    setShareScreenStatus(false);
+    onRoomLeave();
+  };
+
+  const changeVideoStatus = () => {
+    if (videoApi) videoApi.executeCommand("toggleVideo");
+  };
+
+  const changeAudioStatus = () => {
+    if (videoApi) videoApi.executeCommand("toggleAudio");
+  };
+
+  const changeTileviewStatus = () => {
+    if (videoApi) videoApi.executeCommand("toggleTileView");
+  };
+
+  const changeShareScreenStatus = () => {
+    if (videoApi) videoApi.executeCommand("toggleShareScreen");
+  };
+
+  const changeDisplayName = (name) => {
     localStorage.setItem("displayName", name || "");
     setDisplayName(name);
     if (videoApi) videoApi.executeCommand("displayName", name);
   };
 
-  const openRoom = (roomName) => {
-    setRoomAlias("");
-    setRoomName(roomName);
-    ReactGA.pageview(roomName);
-  };
-
-  const onRoomEnter = () => {
-    updateMyStatus(displayName, roomName);
-  };
-
   const onRoomLeave = () => {
+    setIsRoomLoading(false);
     updateMyStatus(displayName, "");
   };
 
-  const hangUp = () => {
-    setRoomName(null);
-    if (videoApi) videoApi.dispose();
-    onRoomLeave();
+  const onRoomEntered = () => {
+    setIsRoomLoading(true);
+    updateMyStatus(displayName, currentRoomName);
   };
 
-  const onShareScreen = (status) => {
-    setShareScreen(status);
+  const onMicStatusChanged = (micStatus) => {
+    setMicStatus(micStatus);
   };
 
-  const onMuted = (muted) => {
-    setMic(!muted);
+  const onVideoStatusChanged = (videoStatus) => {
+    setVideoStatus(videoStatus);
   };
 
-  const getRandomId = () => {
-    return Math.random().toString(36);
+  const onTileviewStatusChanged = (tileviewStatus) => {
+    setTitleviewStatus(tileviewStatus);
   };
 
-  const toggleCamera = () => {
-    setCamera(!camera);
-    if (videoApi) videoApi.executeCommand("toggleVideo");
-  };
-
-  const toggleMic = () => {
-    setMic(!mic);
-    if (videoApi) videoApi.executeCommand("toggleAudio");
-  };
-
-  const toggleViewMode = () => {
-    if (videoApi) videoApi.executeCommand("toggleTileView");
+  const onShareScreenStatusChanged = (shareScreenStatus) => {
+    setShareScreenStatus(shareScreenStatus);
   };
 
   // const toggleChat = () => {
   //   if (videoApi) videoApi.executeCommand("toggleChat");
   // };
-
-  const toggleShateScreen = () => {
-    if (videoApi) videoApi.executeCommand("toggleShareScreen");
-  };
 
   const startServerConnection = (userId) => {
     websocketClient = new w3cwebsocket(
@@ -120,13 +130,13 @@ const MainPage = () => {
 
     websocketClient.onmessage = (message) => {
       const payload = JSON.parse(message.data);
-      if (payload.newRoomName) setRoomAlias(payload.newRoomName);
+      if (payload.newRoomName) setCurrentRoomAlias(payload.newRoomName);
 
       if (payload.onlineUsers) setOnlineUsers(payload.onlineUsers);
       if (payload.onlineRooms) {
         setOnlineRooms(payload.onlineRooms);
 
-        const currentRoom = roomName || initialRoomName;
+        const currentRoom = currentRoomName || initialRoomName;
         if (currentRoom) {
           const myRoomOnOnlineRoomsIndex = payload.onlineRooms.findIndex(
             (x) => x.roomName === currentRoom
@@ -134,9 +144,9 @@ const MainPage = () => {
           if (
             myRoomOnOnlineRoomsIndex > -1 &&
             payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias !==
-              roomAlias
+              currentRoomAlias
           )
-            setRoomAlias(
+            setCurrentRoomAlias(
               payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias
             );
         }
@@ -184,6 +194,10 @@ const MainPage = () => {
   //   }
   // };
 
+  const getRandomId = () => {
+    return Math.random().toString(36);
+  };
+
   useEffect(() => {
     ReactGA.initialize("UA-170290043-1");
     let updatedUserId = userId;
@@ -193,7 +207,7 @@ const MainPage = () => {
       setUserId(updatedUserId);
     }
     startServerConnection(updatedUserId);
-    if (initialRoomName) openRoom(initialRoomName);
+    if (initialRoomName) enterRoom(initialRoomName);
   }, []);
 
   return (
@@ -207,7 +221,7 @@ const MainPage = () => {
                   color="secondary"
                   value={displayName}
                   placeholder="seu apelido"
-                  onChange={(e) => onNameChange(e.target.value)}
+                  onChange={(e) => changeDisplayName(e.target.value)}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -217,16 +231,20 @@ const MainPage = () => {
                   }}
                 />
               </div>
-              {roomName && (
+              {isRoomLoading && (
                 <div className="currentRoomName">
                   <TextField
                     color="secondary"
-                    value={roomAlias}
+                    value={currentRoomAlias}
                     placeholder="nome da sala"
                     inputProps={{ min: 0, style: { textAlign: "center" } }}
-                    onChange={(e) => setRoomAlias(e.target.value)}
+                    onChange={(e) => setCurrentRoomAlias(e.target.value)}
                     onBlur={() =>
-                      changeRoomName(displayName, roomName, roomAlias)
+                      changeRoomName(
+                        displayName,
+                        currentRoomName,
+                        currentRoomAlias
+                      )
                     }
                     InputProps={{
                       startAdornment: (
@@ -248,9 +266,9 @@ const MainPage = () => {
         )}
       </Sticky>
       <div className="videoContainer">
-        {!roomName ? (
+        {!currentRoomName ? (
           <div className="noRoomContainer">
-            {camera ? (
+            {videoStatus ? (
               <div className="noRoomCameraContainer">
                 <Webcam audio={true} className="noRoomCamera" mirrored />
               </div>
@@ -269,25 +287,27 @@ const MainPage = () => {
         ) : (
           <div className="RoomContainer">
             <VideoFrameComponent
-              roomName={roomName}
-              onMuted={onMuted}
-              onRoomEnter={onRoomEnter}
+              mic={micStatus}
+              camera={videoStatus}
+              roomName={currentRoomName}
               onRoomLeave={onRoomLeave}
-              onShareScreen={onShareScreen}
-              camera={camera}
-              mic={mic}
+              onRoomEntered={onRoomEntered}
+              onMicStatusChanged={onMicStatusChanged}
+              onVideoStatusChanged={onVideoStatusChanged}
+              onTileviewStatusChanged={onTileviewStatusChanged}
+              onShareScreenStatusChanged={onShareScreenStatusChanged}
             />
           </div>
         )}
       </div>
       <div className="roomButtonContainer">
-        {!roomName ? (
+        {!currentRoomName ? (
           <Button
             size="small"
             color="secondary"
             variant="contained"
             startIcon={<FiPlayCircle />}
-            onClick={() => openRoom(getRandomId())}
+            onClick={() => enterRoom(getRandomId())}
           >
             Criar sala
           </Button>
@@ -300,7 +320,7 @@ const MainPage = () => {
               <WhatsappShareButton
                 id="shareButton"
                 className="inviteShareButton"
-                url={`https://www.injoy.chat/?initialRoomName=${roomName}`}
+                url={`https://www.injoy.chat/?initialRoomName=${currentRoomName}`}
               >
                 <WhatsappIcon size={20} round={true} />
               </WhatsappShareButton>
@@ -312,19 +332,19 @@ const MainPage = () => {
         )}
       </div>
       <ButtonGroup className="controlPanel">
-        <IconButton onClick={toggleCamera} className="controlPanelButton">
-          {camera ? <FiVideo /> : <FiVideoOff />}
+        <IconButton onClick={changeVideoStatus} className="controlPanelButton">
+          {videoStatus ? <FiVideo /> : <FiVideoOff />}
         </IconButton>
-        <IconButton onClick={toggleMic}>
-          {mic ? <FiMic /> : <FiMicOff />}
+        <IconButton onClick={changeAudioStatus}>
+          {micStatus ? <FiMic /> : <FiMicOff />}
         </IconButton>
         <IconButton
           size="small"
-          onClick={toggleViewMode}
-          disabled={!roomName}
+          onClick={changeTileviewStatus}
+          disabled={!currentRoomName}
           className="controlPanelButton"
         >
-          <FiGrid />
+          {titleviewStatus ? <FiGrid /> : <FiSquare />}
         </IconButton>
         {/* <IconButton size="small" onClick={toggleChat} disabled={!roomName} className="controlPanelButton" >
           <FiMessageSquare />
@@ -332,10 +352,10 @@ const MainPage = () => {
         {!isMobile && (
           <IconButton
             size="small"
-            color={shareScreen && "secondary"}
+            color={shareScreenStatus && "secondary"}
             className="controlPanelButton"
-            onClick={toggleShateScreen}
-            disabled={!roomName}
+            onClick={changeShareScreenStatus}
+            disabled={!currentRoomName}
           >
             <FiShare />
           </IconButton>
@@ -344,14 +364,17 @@ const MainPage = () => {
           size="small"
           color="secondary"
           className="controlPanelButton"
-          onClick={hangUp}
-          disabled={!roomName}
+          onClick={leaveRoom}
+          disabled={!currentRoomName}
         >
           <FiPhoneMissed />
         </IconButton>
       </ButtonGroup>
       {onlineRooms.length > 0 &&
-        !(onlineRooms.length === 1 && onlineRooms[0].roomName === roomName) && (
+        !(
+          onlineRooms.length === 1 &&
+          onlineRooms[0].roomName === currentRoomName
+        ) && (
           <div className="onlineRoomsListContainer">
             <div className="onlineRoomsListTitleContainer">
               <img
@@ -365,11 +388,11 @@ const MainPage = () => {
             <div className="onlineRoomsList">
               {onlineRooms.map(
                 (onlineRoom) =>
-                  onlineRoom.roomName !== roomName && (
+                  onlineRoom.roomName !== currentRoomName && (
                     <Card style={{ marginTop: 10 }}>
                       <div
                         className="onlineRoom"
-                        onClick={() => openRoom(onlineRoom.roomName)}
+                        onClick={() => enterRoom(onlineRoom.roomName)}
                       >
                         <div className="onlineRoomNameContainer">
                           <div className="onlineRoomName">
