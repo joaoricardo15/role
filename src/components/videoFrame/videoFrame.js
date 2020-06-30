@@ -14,7 +14,7 @@ export const VideoFrameComponent = ({
   roomName,
   onRoomLeave,
   onRoomEntered,
-  onMicStatusChanged,
+  onAudioStatusChanged,
   onVideoStatusChanged,
   onTileviewStatusChanged,
   onShareScreenStatusChanged,
@@ -110,9 +110,9 @@ export const VideoFrameComponent = ({
       videoAvailabilityChanged: (payload) =>
         onVideoStatusChanged(payload.available),
       audioAvailabilityChanged: (payload) =>
-        onMicStatusChanged(payload.available),
-      videoMuteStatusChanged: (payload) => onMicStatusChanged(!payload.muted),
-      audioMuteStatusChanged: (payload) => onMicStatusChanged(!payload.muted),
+        onAudioStatusChanged(payload.available),
+      videoMuteStatusChanged: (payload) => onVideoStatusChanged(!payload.muted),
+      audioMuteStatusChanged: (payload) => onAudioStatusChanged(!payload.muted),
       screenSharingStatusChanged: (payload) =>
         onShareScreenStatusChanged(payload.on),
       tileViewChanged: (payload) => onTileviewStatusChanged(payload.enabled),

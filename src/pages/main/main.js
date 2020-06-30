@@ -118,7 +118,7 @@ const MainPage = () => {
     sendMessage("hello from app");
   };
 
-  const onMicStatusChanged = (micStatus) => {
+  const onAudioStatusChanged = (micStatus) => {
     setAudioStatus(micStatus);
   };
 
@@ -313,7 +313,7 @@ const MainPage = () => {
               roomName={currentRoomName}
               onRoomLeave={onRoomLeave}
               onRoomEntered={onRoomEntered}
-              onMicStatusChanged={onMicStatusChanged}
+              onAudioStatusChanged={onAudioStatusChanged}
               onVideoStatusChanged={onVideoStatusChanged}
               onTileviewStatusChanged={onTileviewStatusChanged}
               onShareScreenStatusChanged={onShareScreenStatusChanged}
