@@ -84,13 +84,13 @@ const MainPage = () => {
   };
 
   const changeVideoStatus = () => {
-    if (videoApi) videoApi.executeCommand("toggleVideo");
-    else if (!currentRoomName && !isRoomLoading) setVideoStatus(!videoStatus);
+    if (!currentRoomName && !isRoomLoading) setVideoStatus(!videoStatus);
+    else if (videoApi) videoApi.executeCommand("toggleVideo");
   };
 
   const changeAudioStatus = () => {
-    if (videoApi) videoApi.executeCommand("toggleAudio");
-    else if (!currentRoomName && !isRoomLoading) setAudioStatus(!audioStatus);
+    if (!currentRoomName && !isRoomLoading) setAudioStatus(!audioStatus);
+    else if (videoApi) videoApi.executeCommand("toggleAudio");
   };
 
   const changeTileviewStatus = () => {
@@ -118,8 +118,8 @@ const MainPage = () => {
     sendMessage("hello from app");
   };
 
-  const onAudioStatusChanged = (micStatus) => {
-    setAudioStatus(micStatus);
+  const onAudioStatusChanged = (audioStatus) => {
+    setAudioStatus(audioStatus);
   };
 
   const onVideoStatusChanged = (videoStatus) => {
