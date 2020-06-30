@@ -41,7 +41,7 @@ let websocketClient;
 const serverUrl = "wss://18b0p3qzk7.execute-api.us-east-1.amazonaws.com/beta";
 
 const MainPage = () => {
-  const [micStatus, setMicStatus] = useState(true);
+  const [audioStatus, setAudioStatus] = useState(true);
   const [videoStatus, setVideoStatus] = useState(true);
   const [titleviewStatus, setTitleviewStatus] = useState(false);
   const [shareScreenStatus, setShareScreenStatus] = useState(false);
@@ -85,10 +85,12 @@ const MainPage = () => {
 
   const changeVideoStatus = () => {
     if (videoApi) videoApi.executeCommand("toggleVideo");
+    else if (!currentRoomName && !isRoomLoading) setVideoStatus(!videoStatus);
   };
 
   const changeAudioStatus = () => {
     if (videoApi) videoApi.executeCommand("toggleAudio");
+    else if (!currentRoomName && !isRoomLoading) setAudioStatus(!audioStatus);
   };
 
   const changeTileviewStatus = () => {
@@ -117,7 +119,7 @@ const MainPage = () => {
   };
 
   const onMicStatusChanged = (micStatus) => {
-    setMicStatus(micStatus);
+    setAudioStatus(micStatus);
   };
 
   const onVideoStatusChanged = (videoStatus) => {
@@ -306,7 +308,7 @@ const MainPage = () => {
         ) : (
           <div className="RoomContainer">
             <VideoFrameComponent
-              mic={micStatus}
+              mic={audioStatus}
               camera={videoStatus}
               roomName={currentRoomName}
               onRoomLeave={onRoomLeave}
@@ -355,7 +357,7 @@ const MainPage = () => {
           {videoStatus ? <FiVideo /> : <FiVideoOff />}
         </IconButton>
         <IconButton onClick={changeAudioStatus}>
-          {micStatus ? <FiMic /> : <FiMicOff />}
+          {audioStatus ? <FiMic /> : <FiMicOff />}
         </IconButton>
         <IconButton
           size="small"
