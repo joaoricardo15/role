@@ -48,6 +48,7 @@ export const VideoFrameComponent = ({
         enableTalkWhileMuted: false,
         enableNoAudioDetection: false,
         enableNoisyMicDetection: false,
+        enableCalendarIntegration: false,
         desktopSharingSources: true,
         //disableRemoteMute: true,
         remoteVideoMenu: {
@@ -63,6 +64,8 @@ export const VideoFrameComponent = ({
         DEFAULT_REMOTE_DISPLAY_NAME: null,
         VIDEO_QUALITY_LABEL_DISABLED: true,
         CONNECTION_INDICATOR_DISABLED: true,
+        DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+        DISABLE_FOCUS_INDICATOR: true,
         TILE_VIEW_MAX_COLUMNS: 2,
         TOOLBAR_BUTTONS: [
           //"chat",

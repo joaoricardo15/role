@@ -14,6 +14,7 @@ import {
   //FiMessageSquare,
   FiPlayCircle,
   FiAtSign,
+  FiMapPin,
   FiShare,
   FiGrid,
   FiSquare,
@@ -55,6 +56,17 @@ const MainPage = () => {
   );
   const initialRoomName =
     new URLSearchParams(useLocation().search).get("initialRoomName") || "";
+
+  const startUser = () => {
+    let updatedUserId = userId;
+    if (!updatedUserId) {
+      updatedUserId = getRandomId();
+      localStorage.setItem("userId", updatedUserId);
+      setUserId(updatedUserId);
+    }
+
+    return updatedUserId;
+  };
 
   const enterRoom = (roomName) => {
     setIsRoomLoading(true);
@@ -101,6 +113,7 @@ const MainPage = () => {
   const onRoomEntered = () => {
     setIsRoomLoading(true);
     updateMyStatus(displayName, currentRoomName);
+    sendMessage("hello from app");
   };
 
   const onMicStatusChanged = (micStatus) => {
@@ -128,29 +141,34 @@ const MainPage = () => {
       `${serverUrl}/?id=${userId}&displayName=${displayName}&roomName=${initialRoomName}`
     );
 
-    websocketClient.onmessage = (message) => {
-      const payload = JSON.parse(message.data);
-      if (payload.newRoomName) setCurrentRoomAlias(payload.newRoomName);
+    websocketClient.onopen = () => {
+      websocketClient.onmessage = (message) => {
+        const payload = JSON.parse(message.data);
+        if (payload.newRoomName) setCurrentRoomAlias(payload.newRoomName);
 
-      if (payload.onlineUsers) setOnlineUsers(payload.onlineUsers);
-      if (payload.onlineRooms) {
-        setOnlineRooms(payload.onlineRooms);
+        if (payload.onlineUsers) setOnlineUsers(payload.onlineUsers);
+        if (payload.onlineRooms) {
+          setOnlineRooms(payload.onlineRooms);
 
-        const currentRoom = currentRoomName || initialRoomName;
-        if (currentRoom) {
-          const myRoomOnOnlineRoomsIndex = payload.onlineRooms.findIndex(
-            (x) => x.roomName === currentRoom
-          );
-          if (
-            myRoomOnOnlineRoomsIndex > -1 &&
-            payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias !==
-              currentRoomAlias
-          )
-            setCurrentRoomAlias(
-              payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias
+          const currentRoom = currentRoomName || initialRoomName;
+          if (currentRoom) {
+            const myRoomOnOnlineRoomsIndex = payload.onlineRooms.findIndex(
+              (x) => x.roomName === currentRoom
             );
+            if (
+              myRoomOnOnlineRoomsIndex > -1 &&
+              payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias !==
+                currentRoomAlias
+            )
+              setCurrentRoomAlias(
+                payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias
+              );
+          }
         }
-      }
+      };
+
+      if (initialRoomName) enterRoom(initialRoomName);
+      else updateOnlineUsers();
     };
   };
 
@@ -169,6 +187,12 @@ const MainPage = () => {
     }
   };
 
+  const updateOnlineUsers = () => {
+    if (websocketClient.readyState === websocketClient.OPEN) {
+      websocketClient.send(JSON.stringify({ action: "updateOnlineUsers" }));
+    }
+  };
+
   const changeRoomName = (displayName, roomName, newRooName) => {
     if (websocketClient.readyState === websocketClient.OPEN) {
       websocketClient.send(
@@ -184,15 +208,21 @@ const MainPage = () => {
     }
   };
 
-  // const sendMessage = (message) => {
-  //   if (videoApi) {
-  //     videoApi.executeCommand(
-  //       "sendEndpointTextMessage",
-  //       "receiverParticipantId",
-  //       message
-  //     );
-  //   }
-  // };
+  const sendMessage = (message) => {
+    if (websocketClient.readyState === websocketClient.OPEN) {
+      websocketClient.send(
+        JSON.stringify({
+          action: "onMessage",
+          data: {
+            id: userId,
+            displayName: displayName,
+            roomName: currentRoomName,
+            message,
+          },
+        })
+      );
+    }
+  };
 
   const getRandomId = () => {
     return Math.random().toString(36);
@@ -200,14 +230,8 @@ const MainPage = () => {
 
   useEffect(() => {
     ReactGA.initialize("UA-170290043-1");
-    let updatedUserId = userId;
-    if (!updatedUserId) {
-      updatedUserId = getRandomId();
-      localStorage.setItem("userId", updatedUserId);
-      setUserId(updatedUserId);
-    }
+    const updatedUserId = startUser();
     startServerConnection(updatedUserId);
-    if (initialRoomName) enterRoom(initialRoomName);
   }, []);
 
   return (
@@ -249,12 +273,7 @@ const MainPage = () => {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <img
-                            className="currentRoomImage"
-                            src={process.env.PUBLIC_URL + "logo.png"}
-                            width="20"
-                            alt="loading"
-                          />
+                          <FiMapPin />
                         </InputAdornment>
                       ),
                     }}
@@ -378,9 +397,9 @@ const MainPage = () => {
           <div className="onlineRoomsListContainer">
             <div className="onlineRoomsListTitleContainer">
               <img
-                className="currentRoomImage"
+                className="onlineRoomsListIcon"
                 src={process.env.PUBLIC_URL + "logo.png"}
-                width="20"
+                width="30"
                 alt="loading"
               />
               <div className="onlineRoomsListTitle"> salas online </div>

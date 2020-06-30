@@ -16,10 +16,6 @@
   display: flex;
 }
 
-.currentRoomImage {
-  animation: rotate 10s infinite linear;
-}
-
 .currentRoomName {
   width: 40%;
   display: flex;
@@ -74,12 +70,6 @@
   animation: rotate 10s infinite linear;
 }
 
-@keyframes rotate {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .noRoomnoCameraTitle {
   top: 60vh;
   position: absolute;
@@ -100,6 +90,16 @@
   display: flex;
   align-items: center;
   margin-left: 5px;
+}
+
+.onlineRoomsListIcon {
+  animation: rotate 10s infinite linear;
+}
+
+@keyframes rotate {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .onlineRoomsListTitle {
