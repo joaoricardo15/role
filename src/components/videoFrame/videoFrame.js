@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-//import PacmanLoader from "react-spinners/PacmanLoader";
 import luachAnimation from "./../../assets/launch.gif";
 import "./videoFrame.css";
 
@@ -117,14 +116,6 @@ export const VideoFrameComponent = ({
         onShareScreenStatusChanged(payload.on),
       tileViewChanged: (payload) => onTileviewStatusChanged(payload.enabled),
     });
-    // videoApi.addEventListener("incomingMessage", (payload) => {
-    //   alert("in: " + payload.message);
-    // });
-    // videoApi.addEventListener("outgoingMessage", (payload) => {
-    //   alert("out: " + payload.message);
-    //   videoApi.executeCommand("sendEndpointTextMessage", "", payload.message);
-    // });
-    //videoApi.executeCommand("avatarUrl", "./logo.png");
 
     if (!camera) videoApi.executeCommand("toggleVideo");
     if (!mic) videoApi.executeCommand("toggleAudio");
@@ -136,10 +127,6 @@ export const VideoFrameComponent = ({
         <div className="loadingContainer">
           <img src={luachAnimation} width="100%" alt="loading" />
           <div className="loadingTitle">entrando na sala...</div>
-          {/* <div className="loadingTitle">entrando no rolê...</div>
-          <div className="loadingAnimation">
-            <PacmanLoader loading={loading} color="#424242" size="6vh" />
-          </div> */}
         </div>
       )}
       <div

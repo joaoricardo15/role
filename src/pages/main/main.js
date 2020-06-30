@@ -45,14 +45,14 @@ const MainPage = () => {
   const [videoStatus, setVideoStatus] = useState(true);
   const [titleviewStatus, setTitleviewStatus] = useState(false);
   const [shareScreenStatus, setShareScreenStatus] = useState(false);
+  const [isRoomLoading, setIsRoomLoading] = useState(false);
   const [currentRoomName, setCurrentRoomName] = useState("");
   const [currentRoomAlias, setCurrentRoomAlias] = useState("");
-  const [isRoomLoading, setIsRoomLoading] = useState(false);
   const [onlineRooms, setOnlineRooms] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [userId, setUserId] = useState(localStorage.getItem("userId"));
   const [displayName, setDisplayName] = useState(
-    localStorage.getItem("displayName")
+    localStorage.getItem("displayName") || ""
   );
   const initialRoomName =
     new URLSearchParams(useLocation().search).get("initialRoomName") || "";
@@ -70,7 +70,6 @@ const MainPage = () => {
 
   const enterRoom = (roomName) => {
     setIsRoomLoading(true);
-    setCurrentRoomAlias("");
     setCurrentRoomName(roomName);
     ReactGA.pageview(roomName);
   };
@@ -78,6 +77,7 @@ const MainPage = () => {
   const leaveRoom = () => {
     if (videoApi) videoApi.dispose();
     setCurrentRoomName("");
+    setCurrentRoomAlias("");
     setTitleviewStatus(false);
     setShareScreenStatus(false);
     onRoomLeave();
@@ -108,14 +108,12 @@ const MainPage = () => {
   };
 
   const onRoomLeave = () => {
-    setIsRoomLoading(false);
     updateMyStatus(displayName, "");
   };
 
   const onRoomEntered = () => {
-    setIsRoomLoading(true);
+    setIsRoomLoading(false);
     updateMyStatus(displayName, currentRoomName);
-    sendMessage("hello from app");
   };
 
   const onAudioStatusChanged = (audioStatus) => {
@@ -140,7 +138,7 @@ const MainPage = () => {
 
   const startServerConnection = (userId) => {
     websocketClient = new w3cwebsocket(
-      `${serverUrl}/?id=${userId}&displayName=${displayName}&roomName=${initialRoomName}`
+      `${serverUrl}/?id=${userId}&displayName=${displayName}`
     );
 
     websocketClient.onopen = () => {
@@ -166,6 +164,10 @@ const MainPage = () => {
                 payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias
               );
           }
+        }
+        if (payload.randomRoomName) {
+          enterRoom(payload.randomRoomName);
+          requestRandomRoom(false);
         }
       };
 
@@ -204,6 +206,19 @@ const MainPage = () => {
             displayName: displayName,
             roomName: roomName,
             newRoomName: newRooName,
+          },
+        })
+      );
+    }
+  };
+
+  const requestRandomRoom = (enable) => {
+    if (websocketClient.readyState === websocketClient.OPEN) {
+      websocketClient.send(
+        JSON.stringify({
+          action: "onRandomRoom",
+          data: {
+            enable,
           },
         })
       );
@@ -257,7 +272,7 @@ const MainPage = () => {
                   }}
                 />
               </div>
-              {isRoomLoading && (
+              {currentRoomName && !isRoomLoading && (
                 <div className="currentRoomName">
                   <TextField
                     color="secondary"
