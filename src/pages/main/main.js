@@ -5,14 +5,18 @@ import { isMobile } from "react-device-detect";
 import { useLocation } from "react-router-dom";
 import { StickyContainer, Sticky } from "react-sticky";
 import { WhatsappShareButton, WhatsappIcon } from "react-share";
+import { GiAstronautHelmet } from "react-icons/gi";
+import { MdSend } from "react-icons/md";
 import {
   FiVideo,
   FiVideoOff,
   FiMic,
   FiMicOff,
   FiPhoneMissed,
-  //FiMessageSquare,
-  FiPlayCircle,
+  FiMessageSquare,
+  //FiPlayCircle,
+  FiX,
+  FiPlay,
   FiAtSign,
   FiMapPin,
   FiShare,
@@ -32,12 +36,12 @@ import {
   videoApi,
   VideoFrameComponent,
 } from "./../../components/videoFrame/videoFrame";
-import InstallCardComponent from "../../components/installCard/installCard";
+//import InstallCardComponent from "../../components/installCard/installCard";
 import noVideoAnimation from "./../../assets/astronaut.gif";
+import launchAnimation from "./../../assets/launch.gif";
 import "./main.css";
 
 let websocketClient;
-//const serverUrl = "ws://localhost:1000";
 const serverUrl = "wss://18b0p3qzk7.execute-api.us-east-1.amazonaws.com/beta";
 
 const MainPage = () => {
@@ -45,7 +49,10 @@ const MainPage = () => {
   const [videoStatus, setVideoStatus] = useState(true);
   const [titleviewStatus, setTitleviewStatus] = useState(false);
   const [shareScreenStatus, setShareScreenStatus] = useState(false);
+  const [messageInputStatus, setMessageInputStatus] = useState(false);
+  const [message, setMessage] = useState("");
   const [isRoomLoading, setIsRoomLoading] = useState(false);
+  const [isRandomRoomLoading, setIsRandomRoomLoading] = useState(false);
   const [currentRoomName, setCurrentRoomName] = useState("");
   const [currentRoomAlias, setCurrentRoomAlias] = useState("");
   const [onlineRooms, setOnlineRooms] = useState([]);
@@ -80,6 +87,7 @@ const MainPage = () => {
     setCurrentRoomAlias("");
     setTitleviewStatus(false);
     setShareScreenStatus(false);
+    setMessageInputStatus(false);
     onRoomLeave();
   };
 
@@ -112,7 +120,7 @@ const MainPage = () => {
   };
 
   const onRoomEntered = () => {
-    setIsRoomLoading(false);
+    setIsRoomLoading("");
     updateMyStatus(displayName, currentRoomName);
   };
 
@@ -132,10 +140,6 @@ const MainPage = () => {
     setShareScreenStatus(shareScreenStatus);
   };
 
-  // const toggleChat = () => {
-  //   if (videoApi) videoApi.executeCommand("toggleChat");
-  // };
-
   const startServerConnection = (userId) => {
     websocketClient = new w3cwebsocket(
       `${serverUrl}/?id=${userId}&displayName=${displayName}`
@@ -144,9 +148,28 @@ const MainPage = () => {
     websocketClient.onopen = () => {
       websocketClient.onmessage = (message) => {
         const payload = JSON.parse(message.data);
-        if (payload.newRoomName) setCurrentRoomAlias(payload.newRoomName);
+        if (payload.newRoomName) {
+          setCurrentRoomAlias(payload.newRoomName);
+        }
 
-        if (payload.onlineUsers) setOnlineUsers(payload.onlineUsers);
+        if (payload.randomRoomName) {
+          requestRandomRoom(false);
+          enterRoom(payload.randomRoomName);
+          setIsRandomRoomLoading(false);
+        }
+
+        if (payload.message) {
+          alert(
+            `${payload.id === userId ? "Eu" : payload.displayName} disse: ${
+              payload.message
+            }`
+          );
+        }
+
+        if (payload.onlineUsers) {
+          setOnlineUsers(payload.onlineUsers);
+        }
+
         if (payload.onlineRooms) {
           setOnlineRooms(payload.onlineRooms);
 
@@ -164,10 +187,6 @@ const MainPage = () => {
                 payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias
               );
           }
-        }
-        if (payload.randomRoomName) {
-          enterRoom(payload.randomRoomName);
-          requestRandomRoom(false);
         }
       };
 
@@ -213,6 +232,7 @@ const MainPage = () => {
   };
 
   const requestRandomRoom = (enable) => {
+    setIsRandomRoomLoading(enable);
     if (websocketClient.readyState === websocketClient.OPEN) {
       websocketClient.send(
         JSON.stringify({
@@ -238,7 +258,14 @@ const MainPage = () => {
           },
         })
       );
+
+      setMessage("");
+      setMessageInputStatus("");
     }
+  };
+
+  const changeMessageInputStatus = () => {
+    setMessageInputStatus(!messageInputStatus);
   };
 
   const getRandomId = () => {
@@ -303,109 +330,208 @@ const MainPage = () => {
       </Sticky>
       <div className="videoContainer">
         {!currentRoomName ? (
-          <div className="noRoomContainer">
-            {videoStatus ? (
-              <div className="noRoomCameraContainer">
-                <Webcam audio={true} className="noRoomCamera" mirrored />
+          <div>
+            {isRandomRoomLoading ? (
+              <div className="loadingContainer">
+                <img src={launchAnimation} width="100%" alt="loading" />
+                <div className="loadingTitle">
+                  procurando pessoa aleatória...
+                </div>
               </div>
             ) : (
-              <img
-                className="noRoomNoCameraImage"
-                src={noVideoAnimation}
-                width="50%"
-                alt="loading"
-              />
+              <div className="noRoomContainer">
+                {videoStatus ? (
+                  <div className="noRoomCameraContainer">
+                    <Webcam audio={true} className="noRoomCamera" mirrored />
+                  </div>
+                ) : (
+                  <img
+                    className="noRoomNoCameraImage"
+                    src={noVideoAnimation}
+                    width="50%"
+                    alt="loading"
+                  />
+                )}
+
+                <div className="noRoomTitleContainer">
+                  <div className="noRoomTitle">você não está conectado.</div>
+                  <div
+                    onClick={() => enterRoom(getRandomId())}
+                    className="noRoomCreateRoomButtom"
+                  >
+                    Criar Sala
+                  </div>
+                </div>
+              </div>
             )}
-            <div className="noRoomnoCameraTitle">
-              você não está conectado à uma sala
-            </div>
           </div>
         ) : (
           <div className="RoomContainer">
-            <VideoFrameComponent
-              mic={audioStatus}
-              camera={videoStatus}
-              roomName={currentRoomName}
-              onRoomLeave={onRoomLeave}
-              onRoomEntered={onRoomEntered}
-              onAudioStatusChanged={onAudioStatusChanged}
-              onVideoStatusChanged={onVideoStatusChanged}
-              onTileviewStatusChanged={onTileviewStatusChanged}
-              onShareScreenStatusChanged={onShareScreenStatusChanged}
+            {isRoomLoading && (
+              <div className="loadingContainer">
+                <img src={launchAnimation} width="100%" alt="loading" />
+                <div className="loadingTitle">entrando na sala...</div>
+              </div>
+            )}
+            <div
+              className={isRoomLoading ? "hiddenContainer" : "visibleContainer"}
+            >
+              <VideoFrameComponent
+                mic={audioStatus}
+                camera={videoStatus}
+                roomName={currentRoomName}
+                onRoomLeave={onRoomLeave}
+                onRoomEntered={onRoomEntered}
+                onAudioStatusChanged={onAudioStatusChanged}
+                onVideoStatusChanged={onVideoStatusChanged}
+                onTileviewStatusChanged={onTileviewStatusChanged}
+                onShareScreenStatusChanged={onShareScreenStatusChanged}
+              />
+            </div>
+          </div>
+        )}
+        {messageInputStatus && (
+          <div className="messageContainer">
+            <TextField
+              multiline
+              autoFocus
+              rows={1}
+              rowsMax={4}
+              color="secondary"
+              value={message}
+              placeholder="menssagem"
+              variant="filled"
+              onChange={(e) => setMessage(e.target.value)}
+              InputProps={{
+                className: "sendMessageInput",
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      size="small"
+                      onClick={() => sendMessage(message)}
+                      className="sendMessageButton"
+                      edge="end"
+                    >
+                      <MdSend />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
           </div>
         )}
       </div>
       <div className="roomButtonContainer">
         {!currentRoomName ? (
-          <Button
-            size="small"
-            color="secondary"
-            variant="contained"
-            startIcon={<FiPlayCircle />}
-            onClick={() => enterRoom(getRandomId())}
-          >
-            Criar sala
-          </Button>
-        ) : (
-          <Button
-            size="small"
-            variant="contained"
-            style={{ backgroundColor: "#25D365", color: "white" }}
-            startIcon={
-              <WhatsappShareButton
-                id="shareButton"
-                className="inviteShareButton"
-                url={`https://www.injoy.chat/?initialRoomName=${currentRoomName}`}
+          isRandomRoomLoading ? (
+            <Button
+              size="small"
+              color="secondary"
+              variant="contained"
+              startIcon={<FiX />}
+              onClick={() => requestRandomRoom(false)}
+            >
+              Cancelar busca
+            </Button>
+          ) : (
+            <div className="initialButtonsContainer">
+              {/* <Button
+                size="small"
+                color="secondary"
+                variant="contained"
+                startIcon={<FiMapPin />}
+                onClick={() => enterRoom(getRandomId())}
               >
-                <WhatsappIcon size={20} round={true} />
-              </WhatsappShareButton>
-            }
-            onClick={() => document.getElementById("shareButton").click()}
-          >
-            Convidar amigos
-          </Button>
+                Criar nova sala
+              </Button> */}
+              <Button
+                size="small"
+                color="secondary"
+                variant="contained"
+                startIcon={<GiAstronautHelmet />} //<FiPlay />}
+                onClick={() => requestRandomRoom(true)}
+              >
+                Sala aleatória
+              </Button>
+            </div>
+          )
+        ) : (
+          !messageInputStatus && (
+            <Button
+              size="small"
+              variant="contained"
+              style={{ backgroundColor: "#25D365", color: "white" }}
+              startIcon={
+                <WhatsappShareButton
+                  id="shareButton"
+                  className="inviteShareButton"
+                  url={`https://www.injoy.chat/?initialRoomName=${currentRoomName}`}
+                >
+                  <WhatsappIcon size={20} round={true} />
+                </WhatsappShareButton>
+              }
+              onClick={() => document.getElementById("shareButton").click()}
+            >
+              Convidar amigos
+            </Button>
+          )
         )}
       </div>
-      <ButtonGroup className="controlPanel">
-        <IconButton onClick={changeVideoStatus} className="controlPanelButton">
-          {videoStatus ? <FiVideo /> : <FiVideoOff />}
-        </IconButton>
-        <IconButton onClick={changeAudioStatus}>
-          {audioStatus ? <FiMic /> : <FiMicOff />}
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={changeTileviewStatus}
-          disabled={!currentRoomName}
-          className="controlPanelButton"
+      {!isRoomLoading && !isRandomRoomLoading && (
+        <ButtonGroup
+          className={currentRoomName ? "controlPanel" : "initialControlPanel"}
         >
-          {titleviewStatus ? <FiGrid /> : <FiSquare />}
-        </IconButton>
-        {/* <IconButton size="small" onClick={toggleChat} disabled={!roomName} className="controlPanelButton" >
-          <FiMessageSquare />
-        </IconButton> */}
-        {!isMobile && (
           <IconButton
-            size="small"
-            color={shareScreenStatus && "secondary"}
+            onClick={changeVideoStatus}
             className="controlPanelButton"
-            onClick={changeShareScreenStatus}
-            disabled={!currentRoomName}
           >
-            <FiShare />
+            {videoStatus ? <FiVideo /> : <FiVideoOff />}
           </IconButton>
-        )}
-        <IconButton
-          size="small"
-          color="secondary"
-          className="controlPanelButton"
-          onClick={leaveRoom}
-          disabled={!currentRoomName}
-        >
-          <FiPhoneMissed />
-        </IconButton>
-      </ButtonGroup>
+          <IconButton onClick={changeAudioStatus}>
+            {audioStatus ? <FiMic /> : <FiMicOff />}
+          </IconButton>
+          {currentRoomName && !isRoomLoading && (
+            <div className="initialControlPanelButtonsContainer">
+              <IconButton
+                size="small"
+                onClick={changeMessageInputStatus}
+                disabled={!currentRoomName || isRoomLoading}
+                className="controlPanelButton"
+              >
+                <FiMessageSquare />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={changeTileviewStatus}
+                disabled={!currentRoomName || isRoomLoading}
+                className="controlPanelButton"
+              >
+                {titleviewStatus ? <FiGrid /> : <FiSquare />}
+              </IconButton>
+              {!isMobile && (
+                <IconButton
+                  size="small"
+                  color={shareScreenStatus && "secondary"}
+                  className="controlPanelButton"
+                  onClick={changeShareScreenStatus}
+                  disabled={!currentRoomName || isRoomLoading}
+                >
+                  <FiShare />
+                </IconButton>
+              )}
+              <IconButton
+                size="small"
+                color="secondary"
+                className="controlPanelButton"
+                onClick={leaveRoom}
+                disabled={!currentRoomName || isRoomLoading}
+              >
+                <FiPhoneMissed />
+              </IconButton>
+            </div>
+          )}
+        </ButtonGroup>
+      )}
       {onlineRooms.length > 0 &&
         !(
           onlineRooms.length === 1 &&
@@ -456,7 +582,7 @@ const MainPage = () => {
             <div>{onlineUser.displayName} </div>
           ))}
         </div> */}
-      <InstallCardComponent />
+      {/* <InstallCardComponent /> */}
     </StickyContainer>
   );
 };

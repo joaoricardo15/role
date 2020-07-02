@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from "react";
-import luachAnimation from "./../../assets/launch.gif";
-import "./videoFrame.css";
+import React, { useEffect } from "react";
 
 const domain = "meet.jit.si";
 const parentNode = "jitsiContainer";
@@ -18,16 +16,9 @@ export const VideoFrameComponent = ({
   onTileviewStatusChanged,
   onShareScreenStatusChanged,
 }) => {
-  const [loading, setLoading] = useState(true);
   const displayName = localStorage.getItem("displayName");
 
-  const onRoomEnter = () => {
-    setLoading(false);
-    onRoomEntered();
-  };
-
   useEffect(() => {
-    if (!loading) setLoading(true);
     if (videoApi) videoApi.dispose();
     const options = {
       roomName: `rolê_${roomName}`,
@@ -104,7 +95,7 @@ export const VideoFrameComponent = ({
     // eslint-disable-next-line no-undef
     videoApi = new JitsiMeetExternalAPI(domain, options);
     videoApi.addEventListeners({
-      videoConferenceJoined: onRoomEnter,
+      videoConferenceJoined: onRoomEntered,
       videoConferenceLeft: onRoomLeave,
       videoAvailabilityChanged: (payload) =>
         onVideoStatusChanged(payload.available),
@@ -121,18 +112,5 @@ export const VideoFrameComponent = ({
     if (!mic) videoApi.executeCommand("toggleAudio");
   }, [roomName]);
 
-  return (
-    <div>
-      {loading && (
-        <div className="loadingContainer">
-          <img src={luachAnimation} width="100%" alt="loading" />
-          <div className="loadingTitle">entrando na sala...</div>
-        </div>
-      )}
-      <div
-        id={parentNode}
-        className={loading ? "hiddenContainer" : "visibleContainer"}
-      />
-    </div>
-  );
+  return <div id={parentNode} style={{ height: "100%" }} />;
 };

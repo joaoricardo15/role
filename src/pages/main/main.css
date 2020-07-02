@@ -27,20 +27,49 @@
   height: 70vh;
 }
 
-.roomButtonContainer {
-  display: flex;
-  justify-content: center;
-  margin-top: -40px;
+.RoomContainer {
 }
 
-.controlPanel {
+.visibleContainer {
+  height: 70vh;
+}
+
+.hiddenContainer {
+  display: none;
+}
+
+.loadingContainer {
+  height: 70vh;
+  width: 50vh;
+  padding-top: 30px;
+  margin-left: calc((100vw - 50vh) / 2);
+}
+
+.loadingTitle {
+  left: 0;
+  top: 60vh;
   width: 100%;
-  justify-content: center;
-  padding: 20px 0;
+  position: absolute;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 200;
 }
 
-.controlPanelButton {
-  padding: 0 20px !important;
+.messageContainer {
+  width: 100%;
+  bottom: 24vh;
+  display: flex;
+  position: absolute;
+  justify-content: center;
+}
+
+.sendMessageInput {
+  color: white !important;
+  border-color: white !important;
+}
+
+.sendMessageButton {
+  color: white !important;
 }
 
 .noRoomContainer {
@@ -70,11 +99,38 @@
   animation: rotate 10s infinite linear;
 }
 
-.noRoomnoCameraTitle {
+.noRoomTitleContainer {
   top: 60vh;
-  position: absolute;
   width: 100%;
-  text-align: center;
+  display: flex;
+  position: absolute;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.noRoomTitle {
+  font-size: 12px;
+  font-weight: 200;
+}
+
+.noRoomCreateRoomButtom {
+  font-weight: 800;
+  color: #f50057;
+  margin-left: 3px;
+  text-decoration: underline #f50057;
+}
+
+.roomButtonContainer {
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  margin-top: -40px;
+}
+
+.initialButtonsContainer {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
 }
 
 .inviteShareButton {
@@ -82,8 +138,32 @@
   align-items: center;
 }
 
+.controlPanel {
+  width: 100%;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.initialControlPanel {
+  width: 100%;
+  justify-content: center;
+  padding: 20px 0;
+  position: absolute;
+  top: 46vh;
+}
+
+.initialControlPanelButtonsContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.controlPanelButton {
+  padding: 0 20px !important;
+}
+
 .onlineRoomsListContainer {
-  margin: 10px;
+  padding: 10px;
+  margin-top: 30px;
 }
 
 .onlineRoomsListTitleContainer {
