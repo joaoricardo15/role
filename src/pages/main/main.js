@@ -495,7 +495,6 @@ const MainPage = () => {
               <IconButton
                 size="small"
                 onClick={changeMessageInputStatus}
-                disabled={!currentRoomName || isRoomLoading}
                 className="controlPanelButton"
               >
                 <FiMessageSquare />
@@ -503,7 +502,6 @@ const MainPage = () => {
               <IconButton
                 size="small"
                 onClick={changeTileviewStatus}
-                disabled={!currentRoomName || isRoomLoading}
                 className="controlPanelButton"
               >
                 {titleviewStatus ? <FiGrid /> : <FiSquare />}
@@ -511,10 +509,9 @@ const MainPage = () => {
               {!isMobile && (
                 <IconButton
                   size="small"
-                  color={shareScreenStatus && "secondary"}
+                  color={shareScreenStatus ? "secondary" : ""}
                   className="controlPanelButton"
                   onClick={changeShareScreenStatus}
-                  disabled={!currentRoomName || isRoomLoading}
                 >
                   <FiShare />
                 </IconButton>
@@ -524,7 +521,6 @@ const MainPage = () => {
                 color="secondary"
                 className="controlPanelButton"
                 onClick={leaveRoom}
-                disabled={!currentRoomName || isRoomLoading}
               >
                 <FiPhoneMissed />
               </IconButton>
