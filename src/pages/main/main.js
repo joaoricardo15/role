@@ -5,6 +5,7 @@ import { isMobile } from "react-device-detect";
 import { useLocation } from "react-router-dom";
 import { StickyContainer, Sticky } from "react-sticky";
 import { WhatsappShareButton, WhatsappIcon } from "react-share";
+import ScaleLoader from "react-spinners/ScaleLoader";
 import { GiAstronautHelmet } from "react-icons/gi";
 import { MdSend } from "react-icons/md";
 import {
@@ -14,9 +15,8 @@ import {
   FiMicOff,
   FiPhoneMissed,
   FiMessageSquare,
-  //FiPlayCircle,
   FiX,
-  FiPlay,
+  //FiPlay,
   FiAtSign,
   FiMapPin,
   FiShare,
@@ -27,7 +27,6 @@ import {
   IconButton,
   TextField,
   InputAdornment,
-  ButtonGroup,
   Button,
   Card,
 } from "@material-ui/core";
@@ -37,6 +36,7 @@ import {
   VideoFrameComponent,
 } from "./../../components/videoFrame/videoFrame";
 //import InstallCardComponent from "../../components/installCard/installCard";
+import randomRoomAnimation from "./../../assets/search.gif";
 import noVideoAnimation from "./../../assets/astronaut.gif";
 import launchAnimation from "./../../assets/launch.gif";
 import "./main.css";
@@ -333,9 +333,10 @@ const MainPage = () => {
           <div>
             {isRandomRoomLoading ? (
               <div className="loadingContainer">
-                <img src={launchAnimation} width="100%" alt="loading" />
-                <div className="loadingTitle">
-                  procurando pessoa aleatória...
+                <img src={randomRoomAnimation} width="100%" alt="loading" />
+                <div className="loadingTitleContainer">
+                  <div className="loadingTitle">procurando no espaço...</div>
+                  <ScaleLoader height={18} color="#f50057" loading={true} />
                 </div>
               </div>
             ) : (
@@ -386,6 +387,7 @@ const MainPage = () => {
                 onVideoStatusChanged={onVideoStatusChanged}
                 onTileviewStatusChanged={onTileviewStatusChanged}
                 onShareScreenStatusChanged={onShareScreenStatusChanged}
+                onDisplayNameChange={changeDisplayName}
               />
             </div>
           </div>
@@ -427,7 +429,7 @@ const MainPage = () => {
             <Button
               size="small"
               color="secondary"
-              variant="contained"
+              variant="outlined"
               startIcon={<FiX />}
               onClick={() => requestRandomRoom(false)}
             >
@@ -478,13 +480,10 @@ const MainPage = () => {
         )}
       </div>
       {!isRoomLoading && !isRandomRoomLoading && (
-        <ButtonGroup
+        <div
           className={currentRoomName ? "controlPanel" : "initialControlPanel"}
         >
-          <IconButton
-            onClick={changeVideoStatus}
-            className="controlPanelButton"
-          >
+          <IconButton onClick={changeVideoStatus}>
             {videoStatus ? <FiVideo /> : <FiVideoOff />}
           </IconButton>
           <IconButton onClick={changeAudioStatus}>
@@ -526,7 +525,7 @@ const MainPage = () => {
               </IconButton>
             </div>
           )}
-        </ButtonGroup>
+        </div>
       )}
       {onlineRooms.length > 0 &&
         !(

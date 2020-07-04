@@ -45,14 +45,25 @@
   margin-left: calc((100vw - 50vh) / 2);
 }
 
-.loadingTitle {
+.loadingTitleContainer {
   left: 0;
   top: 60vh;
   width: 100%;
+  display: flex;
   position: absolute;
+  justify-content: center;
+  align-items: center;
+}
+
+.loadingTitle {
+  /* left: 0;
+  top: 60vh;
+  width: 100%;
+  position: absolute; */
   text-align: center;
   font-size: 12px;
   font-weight: 200;
+  margin-right: 10px;
 }
 
 .messageContainer {
@@ -74,8 +85,8 @@
 
 .noRoomContainer {
   width: 100%;
-  display: inline-grid;
-  justify-items: center;
+  display: flex;
+  justify-content: center;
 }
 
 .noRoomCameraContainer {
@@ -140,12 +151,14 @@
 
 .controlPanel {
   width: 100%;
+  display: flex;
   justify-content: center;
   padding: 20px 0;
 }
 
 .initialControlPanel {
   width: 100%;
+  display: flex;
   justify-content: center;
   padding: 20px 0;
   position: absolute;

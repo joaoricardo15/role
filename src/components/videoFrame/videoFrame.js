@@ -15,6 +15,7 @@ export const VideoFrameComponent = ({
   onVideoStatusChanged,
   onTileviewStatusChanged,
   onShareScreenStatusChanged,
+  onDisplayNameChange,
 }) => {
   const displayName = localStorage.getItem("displayName");
 
@@ -31,6 +32,7 @@ export const VideoFrameComponent = ({
         noSSL: true,
         resolution: 240,
         defaultLanguage: "en",
+        liveStreamingEnabled: true,
         enableClosePage: false,
         enableWelcomePage: false,
         disableDeepLinking: true,
@@ -39,6 +41,7 @@ export const VideoFrameComponent = ({
         enableNoAudioDetection: false,
         enableNoisyMicDetection: false,
         enableCalendarIntegration: false,
+        enableInsecureRoomNameWarning: false,
         desktopSharingSources: true,
         //disableRemoteMute: true,
         remoteVideoMenu: {
@@ -54,6 +57,7 @@ export const VideoFrameComponent = ({
         DEFAULT_REMOTE_DISPLAY_NAME: null,
         VIDEO_QUALITY_LABEL_DISABLED: true,
         CONNECTION_INDICATOR_DISABLED: true,
+        DISABLE_DOMINANT_SPEAKER_INDICATOR: true,
         DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
         DISABLE_FOCUS_INDICATOR: true,
         TILE_VIEW_MAX_COLUMNS: 2,
@@ -106,6 +110,7 @@ export const VideoFrameComponent = ({
       screenSharingStatusChanged: (payload) =>
         onShareScreenStatusChanged(payload.on),
       tileViewChanged: (payload) => onTileviewStatusChanged(payload.enabled),
+      displayNameChange: (payload) => onDisplayNameChange(payload.displayname),
     });
 
     if (!camera) videoApi.executeCommand("toggleVideo");
