@@ -29,6 +29,7 @@ import {
   InputAdornment,
   Button,
   Card,
+  Fab,
 } from "@material-ui/core";
 import { w3cwebsocket } from "websocket";
 import {
@@ -36,6 +37,7 @@ import {
   VideoFrameComponent,
 } from "./../../components/videoFrame/videoFrame";
 //import InstallCardComponent from "../../components/installCard/installCard";
+import astronautHelmet from "./../../assets/astronautHelmet.png";
 import randomRoomAnimation from "./../../assets/search.gif";
 import noVideoAnimation from "./../../assets/astronaut.gif";
 import launchAnimation from "./../../assets/launch.gif";
@@ -341,19 +343,23 @@ const MainPage = () => {
               </div>
             ) : (
               <div className="noRoomContainer">
-                {videoStatus ? (
+                <img
+                  className="noRoomAstronautHelmet"
+                  src={astronautHelmet}
+                  alt="astronautHelmet"
+                />
+                {videoStatus && (
                   <div className="noRoomCameraContainer">
                     <Webcam audio={true} className="noRoomCamera" mirrored />
                   </div>
-                ) : (
-                  <img
-                    className="noRoomNoCameraImage"
-                    src={noVideoAnimation}
-                    width="50%"
-                    alt="loading"
-                  />
+                  // ) : (
+                  //   <img
+                  //     className="noRoomNoCameraImage"
+                  //     src={noVideoAnimation}
+                  //     width="50%"
+                  //     alt="loading"
+                  //   />
                 )}
-
                 <div className="noRoomTitleContainer">
                   <div className="noRoomTitle">você não está conectado.</div>
                   <div
@@ -424,8 +430,8 @@ const MainPage = () => {
         )}
       </div>
       <div className="roomButtonContainer">
-        {!currentRoomName ? (
-          isRandomRoomLoading ? (
+        {!currentRoomName &&
+          (isRandomRoomLoading ? (
             <Button
               size="small"
               color="secondary"
@@ -456,77 +462,84 @@ const MainPage = () => {
                 Sala aleatória
               </Button>
             </div>
-          )
-        ) : (
-          !messageInputStatus && (
-            <Button
-              size="small"
-              variant="contained"
-              style={{ backgroundColor: "#25D365", color: "white" }}
-              startIcon={
-                <WhatsappShareButton
-                  id="shareButton"
-                  className="inviteShareButton"
-                  url={`https://www.injoy.chat/?initialRoomName=${currentRoomName}`}
-                >
-                  <WhatsappIcon size={20} round={true} />
-                </WhatsappShareButton>
-              }
-              onClick={() => document.getElementById("shareButton").click()}
-            >
-              Convidar amigos
-            </Button>
-          )
-        )}
+          ))
+          // ) : (
+          //   !messageInputStatus && (
+          //     <Button
+          //       size="small"
+          //       variant="contained"
+          //       style={{ backgroundColor: "#25D365", color: "white" }}
+          //       startIcon={
+          //         <WhatsappShareButton
+          //           id="shareButton"
+          //           className="inviteShareButton"
+          //           url={`https://www.injoy.chat/?initialRoomName=${currentRoomName}`}
+          //         >
+          //           <WhatsappIcon size={20} round={true} />
+          //         </WhatsappShareButton>
+          //       }
+          //       onClick={() => document.getElementById("shareButton").click()}
+          //     >
+          //       Convidar amigos
+          //     </Button>
+          //   )
+        }
       </div>
-      {!isRoomLoading && !isRandomRoomLoading && (
-        <div
-          className={currentRoomName ? "controlPanel" : "initialControlPanel"}
-        >
-          <IconButton onClick={changeVideoStatus}>
-            {videoStatus ? <FiVideo /> : <FiVideoOff />}
-          </IconButton>
-          <IconButton onClick={changeAudioStatus}>
-            {audioStatus ? <FiMic /> : <FiMicOff />}
-          </IconButton>
-          {currentRoomName && !isRoomLoading && (
-            <div className="initialControlPanelButtonsContainer">
-              <IconButton
+      <div className="controlPanelContainer">
+        {!isRoomLoading && !isRandomRoomLoading && (
+          <div
+            className={currentRoomName ? "controlPanel" : "initialControlPanel"}
+          >
+            <Fab
+              onClick={changeVideoStatus}
+              className="controlPanelButton"
+              size="small"
+            >
+              {videoStatus ? <FiVideo /> : <FiVideoOff />}
+            </Fab>
+            <Fab
+              onClick={changeAudioStatus}
+              className="controlPanelButton"
+              size="small"
+            >
+              {audioStatus ? <FiMic /> : <FiMicOff />}
+            </Fab>
+            {currentRoomName && !isRoomLoading && (
+              <Fab
                 size="small"
                 onClick={changeMessageInputStatus}
                 className="controlPanelButton"
               >
                 <FiMessageSquare />
-              </IconButton>
-              <IconButton
+              </Fab>
+            )}
+            {currentRoomName && !isRoomLoading && (
+              <Fab
                 size="small"
                 onClick={changeTileviewStatus}
                 className="controlPanelButton"
               >
                 {titleviewStatus ? <FiGrid /> : <FiSquare />}
-              </IconButton>
-              {!isMobile && (
-                <IconButton
-                  size="small"
-                  color={shareScreenStatus ? "secondary" : ""}
-                  className="controlPanelButton"
-                  onClick={changeShareScreenStatus}
-                >
-                  <FiShare />
-                </IconButton>
-              )}
-              <IconButton
+              </Fab>
+            )}
+            {currentRoomName && !isRoomLoading && !isMobile && (
+              <Fab
                 size="small"
-                color="secondary"
+                color={shareScreenStatus ? "secondary" : ""}
                 className="controlPanelButton"
-                onClick={leaveRoom}
+                onClick={changeShareScreenStatus}
               >
+                <FiShare />
+              </Fab>
+            )}
+            {currentRoomName && !isRoomLoading && (
+              <Fab size="small" color="secondary" onClick={leaveRoom}>
                 <FiPhoneMissed />
-              </IconButton>
-            </div>
-          )}
-        </div>
-      )}
+              </Fab>
+            )}
+          </div>
+        )}
+      </div>
       {onlineRooms.length > 0 &&
         !(
           onlineRooms.length === 1 &&

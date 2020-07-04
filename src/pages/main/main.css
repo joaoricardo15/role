@@ -89,9 +89,15 @@
   justify-content: center;
 }
 
+.noRoomAstronautHelmet {
+  position: absolute;
+  width: 65vh;
+  margin-left: -20px;
+}
+
 .noRoomCameraContainer {
-  width: 30vh;
-  height: 30vh;
+  width: 25vh;
+  height: 20vh;
   display: flex;
   overflow: hidden;
   justify-content: center;
@@ -151,29 +157,28 @@
   align-items: center;
 }
 
-.controlPanel {
-  width: 100%;
+.controlPanelContainer {
   display: flex;
-  justify-content: center;
   padding: 20px 0;
+  justify-content: center;
+}
+
+.controlPanel {
+  width: 300px;
+  display: flex;
+  justify-content: space-evenly;
 }
 
 .initialControlPanel {
-  width: 100%;
+  width: 100px;
   display: flex;
-  justify-content: center;
-  padding: 20px 0;
+  justify-content: space-evenly;
   position: absolute;
   top: 46vh;
 }
 
-.initialControlPanelButtonsContainer {
-  display: flex;
-  justify-content: center;
-}
-
 .controlPanelButton {
-  padding: 0 20px !important;
+  background-color: white !important;
 }
 
 .onlineRoomsListContainer {
