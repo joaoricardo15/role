@@ -14,6 +14,7 @@ export const VideoFrameComponent = ({
   onAudioStatusChanged,
   onVideoStatusChanged,
   onTileviewStatusChanged,
+  onFilmStripStatusChanged,
   onShareScreenStatusChanged,
   onDisplayNameChange,
 }) => {
@@ -53,7 +54,7 @@ export const VideoFrameComponent = ({
       },
       interfaceConfigOverwrite: {
         DEFAULT_BACKGROUND: "white",
-        DEFAULT_LOCAL_DISPLAY_NAME: "você",
+        DEFAULT_LOCAL_DISPLAY_NAME: null,
         DEFAULT_REMOTE_DISPLAY_NAME: null,
         VIDEO_QUALITY_LABEL_DISABLED: true,
         CONNECTION_INDICATOR_DISABLED: true,
@@ -110,9 +111,12 @@ export const VideoFrameComponent = ({
       screenSharingStatusChanged: (payload) =>
         onShareScreenStatusChanged(payload.on),
       tileViewChanged: (payload) => onTileviewStatusChanged(payload.enabled),
+      filmstripDisplayChanged: (payload) =>
+        onFilmStripStatusChanged(payload.visible),
       displayNameChange: (payload) => onDisplayNameChange(payload.displayname),
     });
 
+    videoApi.executeCommand("subject", " ");
     if (!camera) videoApi.executeCommand("toggleVideo");
     if (!mic) videoApi.executeCommand("toggleAudio");
   }, [roomName]);

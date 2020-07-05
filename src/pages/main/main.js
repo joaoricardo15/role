@@ -16,7 +16,7 @@ import {
   FiPhoneMissed,
   FiMessageSquare,
   FiX,
-  //FiPlay,
+  // FiPlay,
   FiAtSign,
   FiMapPin,
   FiShare,
@@ -24,7 +24,7 @@ import {
   FiSquare,
 } from "react-icons/fi";
 import {
-  IconButton,
+  // IconButton,
   TextField,
   InputAdornment,
   Button,
@@ -36,10 +36,10 @@ import {
   videoApi,
   VideoFrameComponent,
 } from "./../../components/videoFrame/videoFrame";
-//import InstallCardComponent from "../../components/installCard/installCard";
+// import InstallCardComponent from "../../components/installCard/installCard";
 import astronautHelmet from "./../../assets/astronautHelmet.png";
 import randomRoomAnimation from "./../../assets/search.gif";
-import noVideoAnimation from "./../../assets/astronaut.gif";
+// import noVideoAnimation from "./../../assets/astronaut.gif";
 import launchAnimation from "./../../assets/launch.gif";
 import "./main.css";
 
@@ -50,9 +50,11 @@ const MainPage = () => {
   const [audioStatus, setAudioStatus] = useState(true);
   const [videoStatus, setVideoStatus] = useState(true);
   const [titleviewStatus, setTitleviewStatus] = useState(false);
+  const [filmStripStatus, setFilmStripStatus] = useState(true);
   const [shareScreenStatus, setShareScreenStatus] = useState(false);
   const [messageInputStatus, setMessageInputStatus] = useState(false);
   const [message, setMessage] = useState("");
+  const [youtubeVideo, setYoutubeVideo] = useState(null);
   const [isRoomLoading, setIsRoomLoading] = useState(false);
   const [isRandomRoomLoading, setIsRandomRoomLoading] = useState(false);
   const [currentRoomName, setCurrentRoomName] = useState("");
@@ -142,59 +144,73 @@ const MainPage = () => {
     setShareScreenStatus(shareScreenStatus);
   };
 
+  const onFilmStripStatusChanged = (filmStripStatus) => {
+    setFilmStripStatus(filmStripStatus);
+  };
+
   const startServerConnection = (userId) => {
     websocketClient = new w3cwebsocket(
       `${serverUrl}/?id=${userId}&displayName=${displayName}`
     );
 
     websocketClient.onopen = () => {
-      websocketClient.onmessage = (message) => {
-        const payload = JSON.parse(message.data);
-        if (payload.newRoomName) {
-          setCurrentRoomAlias(payload.newRoomName);
-        }
-
-        if (payload.randomRoomName) {
-          requestRandomRoom(false);
-          enterRoom(payload.randomRoomName);
-          setIsRandomRoomLoading(false);
-        }
-
-        if (payload.message) {
-          alert(
-            `${payload.id === userId ? "Eu" : payload.displayName} disse: ${
-              payload.message
-            }`
-          );
-        }
-
-        if (payload.onlineUsers) {
-          setOnlineUsers(payload.onlineUsers);
-        }
-
-        if (payload.onlineRooms) {
-          setOnlineRooms(payload.onlineRooms);
-
-          const currentRoom = currentRoomName || initialRoomName;
-          if (currentRoom) {
-            const myRoomOnOnlineRoomsIndex = payload.onlineRooms.findIndex(
-              (x) => x.roomName === currentRoom
-            );
-            if (
-              myRoomOnOnlineRoomsIndex > -1 &&
-              payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias !==
-                currentRoomAlias
-            )
-              setCurrentRoomAlias(
-                payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias
-              );
-          }
-        }
-      };
+      websocketClient.onmessage = onRoomMessage;
 
       if (initialRoomName) enterRoom(initialRoomName);
       else updateOnlineUsers();
     };
+  };
+
+  const onRoomMessage = (message) => {
+    const payload = JSON.parse(message.data);
+    if (payload.newRoomName) {
+      setCurrentRoomAlias(payload.newRoomName);
+    }
+
+    if (payload.randomRoomName) {
+      requestRandomRoom(false);
+      enterRoom(payload.randomRoomName);
+      setIsRandomRoomLoading(false);
+    }
+
+    if (payload.message) {
+      if (payload.message.includes("youtube")) {
+        var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+        var match = payload.message.match(regExp);
+        setYoutubeVideo({
+          videoId: match && match[7].length == 11 ? match[7] : false,
+          displayName: payload.displayName,
+        });
+      } else
+        alert(
+          `${payload.id === userId ? "Eu" : payload.displayName} disse: ${
+            payload.message
+          }`
+        );
+    }
+
+    if (payload.onlineUsers) {
+      setOnlineUsers(payload.onlineUsers);
+    }
+
+    if (payload.onlineRooms) {
+      setOnlineRooms(payload.onlineRooms);
+
+      const currentRoom = currentRoomName || initialRoomName;
+      if (currentRoom) {
+        const myRoomOnOnlineRoomsIndex = payload.onlineRooms.findIndex(
+          (x) => x.roomName === currentRoom
+        );
+        if (
+          myRoomOnOnlineRoomsIndex > -1 &&
+          payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias !==
+            currentRoomAlias
+        )
+          setCurrentRoomAlias(
+            payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias
+          );
+      }
+    }
   };
 
   const updateMyStatus = (displayName, roomName) => {
@@ -274,6 +290,12 @@ const MainPage = () => {
     return Math.random().toString(36);
   };
 
+  const onCloseYoutubeVideo = () => {
+    const youtubeVideoContainer = document.getElementById("youtubeVideoFrame");
+    youtubeVideoContainer.parentNode.removeChild(youtubeVideoContainer);
+    setYoutubeVideo(null);
+  };
+
   useEffect(() => {
     ReactGA.initialize("UA-170290043-1");
     const updatedUserId = startUser();
@@ -291,6 +313,7 @@ const MainPage = () => {
                   color="secondary"
                   value={displayName}
                   placeholder="seu apelido"
+                  className="greetingsInput"
                   onChange={(e) => changeDisplayName(e.target.value)}
                   InputProps={{
                     startAdornment: (
@@ -301,31 +324,6 @@ const MainPage = () => {
                   }}
                 />
               </div>
-              {currentRoomName && !isRoomLoading && (
-                <div className="currentRoomName">
-                  <TextField
-                    color="secondary"
-                    value={currentRoomAlias}
-                    placeholder="nome da sala"
-                    inputProps={{ min: 0, style: { textAlign: "center" } }}
-                    onChange={(e) => setCurrentRoomAlias(e.target.value)}
-                    onBlur={() =>
-                      changeRoomName(
-                        displayName,
-                        currentRoomName,
-                        currentRoomAlias
-                      )
-                    }
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <FiMapPin />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -337,7 +335,9 @@ const MainPage = () => {
               <div className="loadingContainer">
                 <img src={randomRoomAnimation} width="100%" alt="loading" />
                 <div className="loadingTitleContainer">
-                  <div className="loadingTitle">procurando no espaço...</div>
+                  <div className="loadingTitle">
+                    procurando sala no espaço...
+                  </div>
                   <ScaleLoader height={18} color="#f50057" loading={true} />
                 </div>
               </div>
@@ -374,15 +374,101 @@ const MainPage = () => {
           </div>
         ) : (
           <div className="RoomContainer">
-            {isRoomLoading && (
+            {isRoomLoading ? (
               <div className="loadingContainer">
                 <img src={launchAnimation} width="100%" alt="loading" />
-                <div className="loadingTitle">entrando na sala...</div>
+                <div className="loadingTitleContainer">
+                  <div className="loadingTitle">entrando na sala...</div>
+                  <ScaleLoader height={18} color="#f50057" loading={true} />
+                </div>
+              </div>
+            ) : (
+              <div className="currentRoomNameContainer">
+                {filmStripStatus && (
+                  <Card className="currentRoomName">
+                    <TextField
+                      color="secondary"
+                      value={currentRoomAlias}
+                      label="você está em"
+                      placeholder="nome da sala"
+                      inputProps={{ min: 0, style: { textAlign: "icenter" } }}
+                      onChange={(e) => setCurrentRoomAlias(e.target.value)}
+                      onBlur={() =>
+                        changeRoomName(
+                          displayName,
+                          currentRoomName,
+                          currentRoomAlias
+                        )
+                      }
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="start">
+                            <FiMapPin />
+                          </InputAdornment>
+                        ),
+                      }}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
+                    <Button
+                      size="small"
+                      variant="contained"
+                      style={{
+                        height: 20,
+                        width: "100%",
+                        color: "white",
+                        fontSize: 10,
+                        marginTop: 10,
+                        backgroundColor: "#25D365",
+                      }}
+                      startIcon={
+                        <WhatsappShareButton
+                          id="shareButton"
+                          className="inviteShareButton"
+                          url={`https://www.injoy.chat/?initialRoomName=${currentRoomName}`}
+                        >
+                          <WhatsappIcon size={20} round={true} />
+                        </WhatsappShareButton>
+                      }
+                      onClick={() =>
+                        document.getElementById("shareButton").click()
+                      }
+                    >
+                      Convidar amigos
+                    </Button>
+                  </Card>
+                )}
               </div>
             )}
             <div
               className={isRoomLoading ? "hiddenContainer" : "visibleContainer"}
             >
+              {youtubeVideo && youtubeVideo.videoId && (
+                <div className="youtubeVideoContainer">
+                  <div className="youtubeVideoTopBar">
+                    <div className="youtubeVideoTopBarTitle">
+                      video compartilhado por {youtubeVideo.displayName}
+                    </div>
+                    <Fab
+                      color="secondary"
+                      size="small"
+                      onClick={onCloseYoutubeVideo}
+                    >
+                      <FiX />
+                    </Fab>
+                  </div>
+                  <iframe
+                    width="100%"
+                    allow="autoplay"
+                    src={`https://www.youtube.com/embed/${youtubeVideo.videoId}?autoplay=1&autohide=1&showinfo=0&disablekb=1`}
+                    id="youtubeVideoFrame"
+                    title="youtube"
+                    allowfullscreen
+                    frameborder="0"
+                  ></iframe>
+                </div>
+              )}
               <VideoFrameComponent
                 mic={audioStatus}
                 camera={videoStatus}
@@ -392,6 +478,7 @@ const MainPage = () => {
                 onAudioStatusChanged={onAudioStatusChanged}
                 onVideoStatusChanged={onVideoStatusChanged}
                 onTileviewStatusChanged={onTileviewStatusChanged}
+                onFilmStripStatusChanged={onFilmStripStatusChanged}
                 onShareScreenStatusChanged={onShareScreenStatusChanged}
                 onDisplayNameChange={changeDisplayName}
               />
@@ -403,25 +490,26 @@ const MainPage = () => {
             <TextField
               multiline
               autoFocus
-              rows={1}
+              rows={2}
               rowsMax={4}
-              color="secondary"
               value={message}
-              placeholder="menssagem"
+              color="secondary"
               variant="filled"
+              placeholder="menssagem"
               onChange={(e) => setMessage(e.target.value)}
               InputProps={{
                 className: "sendMessageInput",
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton
+                    <Fab
                       size="small"
+                      color="secondary"
                       onClick={() => sendMessage(message)}
                       className="sendMessageButton"
                       edge="end"
                     >
                       <MdSend />
-                    </IconButton>
+                    </Fab>
                   </InputAdornment>
                 ),
               }}
@@ -430,20 +518,21 @@ const MainPage = () => {
         )}
       </div>
       <div className="roomButtonContainer">
-        {!currentRoomName &&
-          (isRandomRoomLoading ? (
-            <Button
-              size="small"
-              color="secondary"
-              variant="outlined"
-              startIcon={<FiX />}
-              onClick={() => requestRandomRoom(false)}
-            >
-              Cancelar busca
-            </Button>
-          ) : (
-            <div className="initialButtonsContainer">
-              {/* <Button
+        {
+          !currentRoomName &&
+            (isRandomRoomLoading ? (
+              <Button
+                size="small"
+                color="secondary"
+                variant="outlined"
+                startIcon={<FiX />}
+                onClick={() => requestRandomRoom(false)}
+              >
+                Cancelar busca
+              </Button>
+            ) : (
+              <div className="initialButtonsContainer">
+                {/* <Button
                 size="small"
                 color="secondary"
                 variant="contained"
@@ -452,17 +541,17 @@ const MainPage = () => {
               >
                 Criar nova sala
               </Button> */}
-              <Button
-                size="small"
-                color="secondary"
-                variant="contained"
-                startIcon={<GiAstronautHelmet />} //<FiPlay />}
-                onClick={() => requestRandomRoom(true)}
-              >
-                Sala aleatória
-              </Button>
-            </div>
-          ))
+                <Button
+                  size="small"
+                  color="secondary"
+                  variant="contained"
+                  startIcon={<GiAstronautHelmet />} //<FiPlay />}
+                  onClick={() => requestRandomRoom(true)}
+                >
+                  Sala aleatória
+                </Button>
+              </div>
+            ))
           // ) : (
           //   !messageInputStatus && (
           //     <Button

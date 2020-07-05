@@ -12,14 +12,25 @@
 }
 
 .greetings {
-  width: 35%;
+  width: 180px;
   display: flex;
 }
 
+.greetingsInput {
+  width: 100%;
+}
+
+.currentRoomNameContainer {
+  top: 53px;
+  left: 5px;
+  width: 190px;
+  height: 100px;
+  position: absolute;
+}
+
 .currentRoomName {
-  width: 40%;
-  display: flex;
-  justify-content: flex-end;
+  height: 80px;
+  padding: 10px;
 }
 
 .videoContainer {
@@ -68,7 +79,7 @@
 
 .messageContainer {
   width: 100%;
-  bottom: 24vh;
+  bottom: calc(30vh - 30px);
   display: flex;
   position: absolute;
   justify-content: center;
@@ -81,6 +92,30 @@
 
 .sendMessageButton {
   color: white !important;
+}
+
+.youtubeVideoContainer {
+  width: 100%;
+  height: 70vh;
+  position: absolute;
+}
+
+.youtubeVideoTopBar {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: white;
+  background-color: black;
+  padding: 10px;
+}
+
+.youtubeVideoTopBarTitle {
+  margin-right: 10px;
+}
+
+#youtubeVideoFrame {
+  height: calc(100% - 56px);
 }
 
 .noRoomContainer {
