@@ -6,30 +6,39 @@ import { useLocation } from "react-router-dom";
 import { StickyContainer, Sticky } from "react-sticky";
 import { WhatsappShareButton, WhatsappIcon } from "react-share";
 import ScaleLoader from "react-spinners/ScaleLoader";
-import { GiAstronautHelmet } from "react-icons/gi";
 import { MdSend } from "react-icons/md";
 import {
-  FiVideo,
-  FiVideoOff,
   FiMic,
+  FiVideo,
   FiMicOff,
+  FiVideoOff,
   FiPhoneMissed,
   FiMessageSquare,
-  FiX,
-  // FiPlay,
+  FiPlay,
   FiAtSign,
   FiMapPin,
+  FiCheck,
   FiShare,
   FiGrid,
-  FiSquare,
+  FiMenu,
+  FiInfo,
+  FiX,
 } from "react-icons/fi";
 import {
-  // IconButton,
+  IconButton,
   TextField,
   InputAdornment,
   Button,
   Card,
   Fab,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  withStyles,
 } from "@material-ui/core";
 import { w3cwebsocket } from "websocket";
 import {
@@ -39,18 +48,35 @@ import {
 // import InstallCardComponent from "../../components/installCard/installCard";
 import astronautHelmet from "./../../assets/astronautHelmet.png";
 import randomRoomAnimation from "./../../assets/search.gif";
-// import noVideoAnimation from "./../../assets/astronaut.gif";
 import launchAnimation from "./../../assets/launch.gif";
 import "./main.css";
 
 let websocketClient;
 const serverUrl = "wss://18b0p3qzk7.execute-api.us-east-1.amazonaws.com/beta";
 
+const CssTextField = withStyles({
+  root: {
+    "& .MuiInput-underline:before, .MuiInput-underline:hover:not(.Mui-disabled):before": {
+      borderBottom: "unset",
+    },
+    "& .MuiInputBase-input": {
+      textOverflow: "ellipsis",
+    },
+  },
+})(TextField);
+
 const MainPage = () => {
+  const webcamRef = React.useRef(null);
+  const [devices, setDevices] = useState({});
+  const [videoInputDevice, setVideoInputDevice] = useState(null);
+  const [videoMenuOpenStatus, setVideoMenuOpenStatus] = useState(null);
+  const [audioInputDevice, setAudioInputDevice] = useState(null);
+  const [audioMenuOpenStatus, setAudioMenuOpenStatus] = useState(null);
   const [audioStatus, setAudioStatus] = useState(true);
   const [videoStatus, setVideoStatus] = useState(true);
   const [titleviewStatus, setTitleviewStatus] = useState(false);
   const [filmStripStatus, setFilmStripStatus] = useState(true);
+  const [drawerOpenStatus, setDrawerOpenStatus] = useState(false);
   const [shareScreenStatus, setShareScreenStatus] = useState(false);
   const [messageInputStatus, setMessageInputStatus] = useState(false);
   const [message, setMessage] = useState("");
@@ -77,6 +103,40 @@ const MainPage = () => {
     }
 
     return updatedUserId;
+  };
+
+  const startMedioDevices = () => {
+    navigator.mediaDevices
+      .enumerateDevices()
+      .then(function (devices) {
+        const videoInputDevices = [];
+        const audioInputDevices = [];
+        const audioOutputDevices = [];
+        for (let i = 0; i < devices.length; i++) {
+          if (devices[i].kind === "videoinput") {
+            videoInputDevices.push({
+              id: devices[i].deviceId,
+              label: devices[i].label,
+            });
+          } else if (devices[i].kind === "audioinput") {
+            audioInputDevices.push({
+              id: devices[i].deviceId,
+              label: devices[i].label,
+            });
+          } else if (devices[i].kind === "audiooutput") {
+            audioOutputDevices.push({
+              id: devices[i].deviceId,
+              label: devices[i].label,
+            });
+          }
+        }
+        setDevices({ videoInputDevices, audioInputDevices });
+        setVideoInputDevice(videoInputDevices[videoInputDevices.length - 1]);
+        setAudioInputDevice(audioInputDevices[audioInputDevices.length - 1]);
+      })
+      .catch(function (err) {
+        console.log(err.name + ": " + err.message);
+      });
   };
 
   const enterRoom = (roomName) => {
@@ -113,18 +173,45 @@ const MainPage = () => {
     if (videoApi) videoApi.executeCommand("toggleShareScreen");
   };
 
+  const changeMessageInputStatus = () => {
+    setMessageInputStatus(!messageInputStatus);
+  };
+
   const changeDisplayName = (name) => {
-    localStorage.setItem("displayName", name || "");
-    setDisplayName(name);
     if (videoApi) videoApi.executeCommand("displayName", name);
+    localStorage.setItem("displayName", name || "");
+    updateMyStatus(displayName, currentRoomName);
+  };
+
+  const sendMessage = (message) => {
+    if (websocketClient.readyState === websocketClient.OPEN) {
+      websocketClient.send(
+        JSON.stringify({
+          action: "onMessage",
+          data: {
+            id: userId,
+            displayName: displayName,
+            roomName: currentRoomName,
+            message,
+          },
+        })
+      );
+
+      setMessage("");
+      setMessageInputStatus("");
+    }
   };
 
   const onRoomLeave = () => {
+    localStorage.setItem("connectionid", null);
+    localStorage.setItem("roomName", null);
     updateMyStatus(displayName, "");
   };
 
-  const onRoomEntered = () => {
+  const onRoomEntered = (id) => {
     setIsRoomLoading("");
+    localStorage.setItem("connectionid", id);
+    localStorage.setItem("roomName", currentRoomName);
     updateMyStatus(displayName, currentRoomName);
   };
 
@@ -146,6 +233,13 @@ const MainPage = () => {
 
   const onFilmStripStatusChanged = (filmStripStatus) => {
     setFilmStripStatus(filmStripStatus);
+  };
+
+  const onChangeDisplayName = (id, name) => {
+    if (id === localStorage.getItem("connectionid")) {
+      if (name !== displayName) setDisplayName(name);
+      localStorage.setItem("displayName", name || "");
+    }
   };
 
   const startServerConnection = (userId) => {
@@ -195,20 +289,16 @@ const MainPage = () => {
 
     if (payload.onlineRooms) {
       setOnlineRooms(payload.onlineRooms);
-
-      const currentRoom = currentRoomName || initialRoomName;
-      if (currentRoom) {
+      const localRoomName = localStorage.getItem("roomName");
+      if (localRoomName) {
         const myRoomOnOnlineRoomsIndex = payload.onlineRooms.findIndex(
-          (x) => x.roomName === currentRoom
+          (x) => x.roomName === localRoomName
         );
-        if (
-          myRoomOnOnlineRoomsIndex > -1 &&
-          payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias !==
-            currentRoomAlias
-        )
+        if (myRoomOnOnlineRoomsIndex > -1) {
           setCurrentRoomAlias(
             payload.onlineRooms[myRoomOnOnlineRoomsIndex].roomAlias
           );
+        }
       }
     }
   };
@@ -263,43 +353,25 @@ const MainPage = () => {
     }
   };
 
-  const sendMessage = (message) => {
-    if (websocketClient.readyState === websocketClient.OPEN) {
-      websocketClient.send(
-        JSON.stringify({
-          action: "onMessage",
-          data: {
-            id: userId,
-            displayName: displayName,
-            roomName: currentRoomName,
-            message,
-          },
-        })
-      );
-
-      setMessage("");
-      setMessageInputStatus("");
-    }
-  };
-
-  const changeMessageInputStatus = () => {
-    setMessageInputStatus(!messageInputStatus);
+  const closeYoutubeVideo = () => {
+    const youtubeVideoContainer = document.getElementById("youtubeVideoFrame");
+    youtubeVideoContainer.parentNode.removeChild(youtubeVideoContainer);
+    setYoutubeVideo(null);
   };
 
   const getRandomId = () => {
     return Math.random().toString(36);
   };
 
-  const onCloseYoutubeVideo = () => {
-    const youtubeVideoContainer = document.getElementById("youtubeVideoFrame");
-    youtubeVideoContainer.parentNode.removeChild(youtubeVideoContainer);
-    setYoutubeVideo(null);
+  const toggleDrawer = (open) => {
+    setDrawerOpenStatus(open);
   };
 
   useEffect(() => {
     ReactGA.initialize("UA-170290043-1");
     const updatedUserId = startUser();
     startServerConnection(updatedUserId);
+    startMedioDevices();
   }, []);
 
   return (
@@ -309,12 +381,14 @@ const MainPage = () => {
           <div className="header" style={style}>
             <div className="headerFirstLine">
               <div className="greetings">
-                <TextField
+                <CssTextField
                   color="secondary"
                   value={displayName}
                   placeholder="seu apelido"
                   className="greetingsInput"
-                  onChange={(e) => changeDisplayName(e.target.value)}
+                  textOverflow="ellipsis"
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  onBlur={() => changeDisplayName(displayName)}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -324,10 +398,140 @@ const MainPage = () => {
                   }}
                 />
               </div>
+              <div>
+                <IconButton
+                  onClick={() => {
+                    startMedioDevices();
+                    toggleDrawer(true);
+                  }}
+                >
+                  <FiMenu />
+                </IconButton>
+              </div>
             </div>
           </div>
         )}
       </Sticky>
+      <Drawer
+        anchor={"right"}
+        open={drawerOpenStatus}
+        onClose={() => toggleDrawer(false)}
+      >
+        <List style={{ padding: 10 }}>
+          {[
+            {
+              text: "Video",
+              icon: <FiVideo />,
+              action: (event) => setVideoMenuOpenStatus(event.currentTarget),
+            },
+            {
+              text: "Audio",
+              icon: <FiMic />,
+              action: (event) => setAudioMenuOpenStatus(event.currentTarget),
+            },
+            {
+              text: "Sobre",
+              icon: <FiInfo />,
+              action: null,
+            },
+          ].map((menu, index) => (
+            <ListItem button key={menu.text} onClick={menu.action}>
+              <ListItemIcon>{menu.icon}</ListItemIcon>
+              <ListItemText primary={menu.text} />
+              <Menu
+                id="simple-menu"
+                anchorEl={videoMenuOpenStatus}
+                keepMounted
+                open={Boolean(videoMenuOpenStatus)}
+                onClose={() => setVideoMenuOpenStatus(null)}
+              >
+                {devices.videoInputDevices &&
+                  devices.videoInputDevices.map((videoDevice) => (
+                    <MenuItem
+                      onClick={(event) => {
+                        setVideoMenuOpenStatus(null);
+                        setVideoInputDevice({
+                          label: videoDevice.label,
+                          id: videoDevice.id,
+                        });
+                        if (videoApi)
+                          videoApi.setVideoInputDevice(
+                            videoDevice.label,
+                            videoDevice.id
+                          );
+                        event.stopPropagation();
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginRight: 8,
+                          minWidth: 20,
+                        }}
+                      >
+                        {videoInputDevice &&
+                          videoInputDevice.id === videoDevice.id && (
+                            <FiCheck style={{ color: "green" }} />
+                          )}
+                      </div>
+                      <div
+                        style={{ overflow: "hidden", textOverflow: "ellipsis" }}
+                      >
+                        {videoDevice.label}
+                      </div>
+                    </MenuItem>
+                  ))}
+              </Menu>
+              <Menu
+                id="simple-menu"
+                anchorEl={audioMenuOpenStatus}
+                keepMounted
+                open={Boolean(audioMenuOpenStatus)}
+                onClose={() => setAudioMenuOpenStatus(null)}
+              >
+                {devices.audioInputDevices &&
+                  devices.audioInputDevices.map((audioDevice) => (
+                    <MenuItem
+                      onClick={(event) => {
+                        setAudioMenuOpenStatus(null);
+                        setAudioInputDevice({
+                          label: audioDevice.label,
+                          id: audioDevice.id,
+                        });
+                        if (videoApi)
+                          videoApi.setAudioInputDevice(
+                            audioDevice.label,
+                            audioDevice.id
+                          );
+                        event.stopPropagation();
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginRight: 8,
+                          minWidth: 20,
+                        }}
+                      >
+                        {audioInputDevice &&
+                          audioInputDevice.id === audioDevice.id && (
+                            <FiCheck style={{ color: "green" }} />
+                          )}
+                      </div>
+                      <div
+                        style={{ overflow: "hidden", textOverflow: "ellipsis" }}
+                      >
+                        {audioDevice.label}
+                      </div>
+                    </MenuItem>
+                  ))}
+              </Menu>
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
       <div className="videoContainer">
         {!currentRoomName ? (
           <div>
@@ -335,10 +539,24 @@ const MainPage = () => {
               <div className="loadingContainer">
                 <img src={randomRoomAnimation} width="100%" alt="loading" />
                 <div className="loadingTitleContainer">
-                  <div className="loadingTitle">
-                    procurando sala no espaço...
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <div style={{ display: "flex" }}>
+                      <div className="loadingTitle">
+                        procurando sala no espaço...
+                      </div>
+                      <ScaleLoader height={18} color="#f50057" loading={true} />
+                    </div>
+                    <Button
+                      size="small"
+                      color="secondary"
+                      variant="outlined"
+                      startIcon={<FiX />}
+                      style={{ marginTop: 40 }}
+                      onClick={() => requestRandomRoom(false)}
+                    >
+                      Cancelar busca
+                    </Button>
                   </div>
-                  <ScaleLoader height={18} color="#f50057" loading={true} />
                 </div>
               </div>
             ) : (
@@ -348,26 +566,67 @@ const MainPage = () => {
                   src={astronautHelmet}
                   alt="astronautHelmet"
                 />
-                {videoStatus && (
+                {videoStatus && videoInputDevice && (
                   <div className="noRoomCameraContainer">
-                    <Webcam audio={true} className="noRoomCamera" mirrored />
+                    <Webcam
+                      audio={true}
+                      className="noRoomCamera"
+                      mirrored
+                      ref={webcamRef}
+                      videoConstraints={{ deviceId: videoInputDevice.id }}
+                    />
                   </div>
-                  // ) : (
-                  //   <img
-                  //     className="noRoomNoCameraImage"
-                  //     src={noVideoAnimation}
-                  //     width="50%"
-                  //     alt="loading"
-                  //   />
                 )}
                 <div className="noRoomTitleContainer">
-                  <div className="noRoomTitle">você não está conectado.</div>
-                  <div
+                  <div className="noRoomTitle">você não está conectado</div>
+                  {/* <div
                     onClick={() => enterRoom(getRandomId())}
                     className="noRoomCreateRoomButtom"
                   >
                     Criar Sala
-                  </div>
+                  </div> */}
+                </div>
+                <div className="roomButtonContainer">
+                  {!currentRoomName && (
+                    <div
+                      className="initialButtonsContainer"
+                      style={{ flexDirection: "column" }}
+                    >
+                      <Fab
+                        size="small"
+                        color="secondary"
+                        variant="outlined"
+                        style={{
+                          height: 20,
+                          color: "#f50057",
+                          backgroundColor: "white",
+                        }}
+                        onClick={() => requestRandomRoom(true)}
+                      >
+                        <FiPlay />
+                        <div
+                          style={{
+                            marginLeft: 10,
+                            marginRight: 10,
+                            fontSize: 10,
+                          }}
+                        >
+                          sala aleatória
+                        </div>
+                      </Fab>
+                      <Fab
+                        size="small"
+                        color="secondary"
+                        variant="extended"
+                        onClick={() => enterRoom(getRandomId())}
+                      >
+                        <FiMapPin />
+                        <div style={{ marginLeft: 10, marginRight: 10 }}>
+                          Criar sala
+                        </div>
+                      </Fab>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -453,7 +712,7 @@ const MainPage = () => {
                     <Fab
                       color="secondary"
                       size="small"
-                      onClick={onCloseYoutubeVideo}
+                      onClick={closeYoutubeVideo}
                     >
                       <FiX />
                     </Fab>
@@ -473,6 +732,7 @@ const MainPage = () => {
                 mic={audioStatus}
                 camera={videoStatus}
                 roomName={currentRoomName}
+                displayName={displayName}
                 onRoomLeave={onRoomLeave}
                 onRoomEntered={onRoomEntered}
                 onAudioStatusChanged={onAudioStatusChanged}
@@ -480,7 +740,9 @@ const MainPage = () => {
                 onTileviewStatusChanged={onTileviewStatusChanged}
                 onFilmStripStatusChanged={onFilmStripStatusChanged}
                 onShareScreenStatusChanged={onShareScreenStatusChanged}
-                onDisplayNameChange={changeDisplayName}
+                onDisplayNameChanged={onChangeDisplayName}
+                videoInput={videoInputDevice.label}
+                audioInput={audioInputDevice.label}
               />
             </div>
           </div>
@@ -517,63 +779,6 @@ const MainPage = () => {
           </div>
         )}
       </div>
-      <div className="roomButtonContainer">
-        {
-          !currentRoomName &&
-            (isRandomRoomLoading ? (
-              <Button
-                size="small"
-                color="secondary"
-                variant="outlined"
-                startIcon={<FiX />}
-                onClick={() => requestRandomRoom(false)}
-              >
-                Cancelar busca
-              </Button>
-            ) : (
-              <div className="initialButtonsContainer">
-                {/* <Button
-                size="small"
-                color="secondary"
-                variant="contained"
-                startIcon={<FiMapPin />}
-                onClick={() => enterRoom(getRandomId())}
-              >
-                Criar nova sala
-              </Button> */}
-                <Button
-                  size="small"
-                  color="secondary"
-                  variant="contained"
-                  startIcon={<GiAstronautHelmet />} //<FiPlay />}
-                  onClick={() => requestRandomRoom(true)}
-                >
-                  Sala aleatória
-                </Button>
-              </div>
-            ))
-          // ) : (
-          //   !messageInputStatus && (
-          //     <Button
-          //       size="small"
-          //       variant="contained"
-          //       style={{ backgroundColor: "#25D365", color: "white" }}
-          //       startIcon={
-          //         <WhatsappShareButton
-          //           id="shareButton"
-          //           className="inviteShareButton"
-          //           url={`https://www.injoy.chat/?initialRoomName=${currentRoomName}`}
-          //         >
-          //           <WhatsappIcon size={20} round={true} />
-          //         </WhatsappShareButton>
-          //       }
-          //       onClick={() => document.getElementById("shareButton").click()}
-          //     >
-          //       Convidar amigos
-          //     </Button>
-          //   )
-        }
-      </div>
       <div className="controlPanelContainer">
         {!isRoomLoading && !isRandomRoomLoading && (
           <div
@@ -584,14 +789,22 @@ const MainPage = () => {
               className="controlPanelButton"
               size="small"
             >
-              {videoStatus ? <FiVideo /> : <FiVideoOff />}
+              {videoStatus ? (
+                <FiVideo />
+              ) : (
+                <FiVideoOff style={{ color: "#f50057" }} />
+              )}
             </Fab>
             <Fab
               onClick={changeAudioStatus}
               className="controlPanelButton"
               size="small"
             >
-              {audioStatus ? <FiMic /> : <FiMicOff />}
+              {audioStatus ? (
+                <FiMic />
+              ) : (
+                <FiMicOff style={{ color: "#f50057" }} />
+              )}
             </Fab>
             {currentRoomName && !isRoomLoading && (
               <Fab
@@ -599,7 +812,9 @@ const MainPage = () => {
                 onClick={changeMessageInputStatus}
                 className="controlPanelButton"
               >
-                <FiMessageSquare />
+                <FiMessageSquare
+                  style={messageInputStatus && { color: "#f50057" }}
+                />
               </Fab>
             )}
             {currentRoomName && !isRoomLoading && (
@@ -608,17 +823,16 @@ const MainPage = () => {
                 onClick={changeTileviewStatus}
                 className="controlPanelButton"
               >
-                {titleviewStatus ? <FiGrid /> : <FiSquare />}
+                <FiGrid style={titleviewStatus && { color: "#f50057" }} />
               </Fab>
             )}
             {currentRoomName && !isRoomLoading && !isMobile && (
               <Fab
                 size="small"
-                color={shareScreenStatus ? "secondary" : ""}
                 className="controlPanelButton"
                 onClick={changeShareScreenStatus}
               >
-                <FiShare />
+                <FiShare style={shareScreenStatus && { color: "#f50057" }} />
               </Fab>
             )}
             {currentRoomName && !isRoomLoading && (

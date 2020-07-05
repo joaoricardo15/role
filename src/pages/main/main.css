@@ -8,12 +8,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0 10px;
 }
 
 .greetings {
-  width: 180px;
+  width: 80%;
   display: flex;
+  margin-left: 10px;
 }
 
 .greetingsInput {
@@ -35,14 +35,14 @@
 
 .videoContainer {
   width: 100%;
-  height: 70vh;
+  height: 80vh;
 }
 
 .RoomContainer {
 }
 
 .visibleContainer {
-  height: 70vh;
+  height: 80vh;
 }
 
 .hiddenContainer {
@@ -50,7 +50,7 @@
 }
 
 .loadingContainer {
-  height: 70vh;
+  height: 80vh;
   width: 50vh;
   padding-top: 30px;
   margin-left: calc((100vw - 50vh) / 2);
@@ -67,10 +67,6 @@
 }
 
 .loadingTitle {
-  /* left: 0;
-  top: 60vh;
-  width: 100%;
-  position: absolute; */
   text-align: center;
   font-size: 12px;
   font-weight: 200;
@@ -96,7 +92,7 @@
 
 .youtubeVideoContainer {
   width: 100%;
-  height: 70vh;
+  height: 80vh;
   position: absolute;
 }
 
@@ -175,16 +171,24 @@
 }
 
 .roomButtonContainer {
-  height: 30px;
-  display: flex;
+  /* display: flex;
   justify-content: center;
-  margin-top: -40px;
+  margin-top: -40px; */
+  top: 70vh;
+  width: 100%;
+  display: flex;
+  position: absolute;
+  /* align-items: flex-end; */
+  justify-content: center;
 }
 
 .initialButtonsContainer {
-  width: 100%;
+  width: auto;
   display: flex;
-  justify-content: space-evenly;
+  flex-direction: column;
+  height: 80px;
+  justify-content: space-between;
+  margin-top: -30px;
 }
 
 .inviteShareButton {

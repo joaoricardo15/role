@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { isMobile } from "react-device-detect";
 
 const domain = "meet.jit.si";
 const parentNode = "jitsiContainer";
@@ -9,6 +10,7 @@ export const VideoFrameComponent = ({
   mic,
   camera,
   roomName,
+  displayName,
   onRoomLeave,
   onRoomEntered,
   onAudioStatusChanged,
@@ -16,20 +18,25 @@ export const VideoFrameComponent = ({
   onTileviewStatusChanged,
   onFilmStripStatusChanged,
   onShareScreenStatusChanged,
-  onDisplayNameChange,
+  onDisplayNameChanged,
+  videoInput,
+  audioInput,
+  audioOutput,
 }) => {
-  const displayName = localStorage.getItem("displayName");
-
   useEffect(() => {
     if (videoApi) videoApi.dispose();
     const options = {
       roomName: `rolê_${roomName}`,
-      parentNode: document.querySelector(`#${parentNode}`),
+      parentNode: document.getElementById(parentNode),
       userInfo: {
         displayName: displayName,
       },
+      devices: {
+        ...(videoInput && { videoInput }),
+        ...(audioInput && { audioInput }),
+        ...(audioOutput && { audioOutput }),
+      },
       configOverwrite: {
-        subject: " ", // hide room name
         noSSL: true,
         resolution: 240,
         defaultLanguage: "en",
@@ -54,14 +61,16 @@ export const VideoFrameComponent = ({
       },
       interfaceConfigOverwrite: {
         DEFAULT_BACKGROUND: "white",
-        DEFAULT_LOCAL_DISPLAY_NAME: null,
+        DEFAULT_LOCAL_DISPLAY_NAME: "",
         DEFAULT_REMOTE_DISPLAY_NAME: null,
         VIDEO_QUALITY_LABEL_DISABLED: true,
         CONNECTION_INDICATOR_DISABLED: true,
         DISABLE_DOMINANT_SPEAKER_INDICATOR: true,
         DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+        SHOW_CHROME_EXTENSION_BANNER: false,
+        HIDE_INVITE_MORE_HEADER: false,
         DISABLE_FOCUS_INDICATOR: true,
-        TILE_VIEW_MAX_COLUMNS: 2,
+        TILE_VIEW_MAX_COLUMNS: isMobile ? 2 : 4,
         TOOLBAR_BUTTONS: [
           //"chat",
           // "hangup",
@@ -100,8 +109,8 @@ export const VideoFrameComponent = ({
     // eslint-disable-next-line no-undef
     videoApi = new JitsiMeetExternalAPI(domain, options);
     videoApi.addEventListeners({
-      videoConferenceJoined: onRoomEntered,
       videoConferenceLeft: onRoomLeave,
+      videoConferenceJoined: (payload) => onRoomEntered(payload.id),
       videoAvailabilityChanged: (payload) =>
         onVideoStatusChanged(payload.available),
       audioAvailabilityChanged: (payload) =>
@@ -113,7 +122,8 @@ export const VideoFrameComponent = ({
       tileViewChanged: (payload) => onTileviewStatusChanged(payload.enabled),
       filmstripDisplayChanged: (payload) =>
         onFilmStripStatusChanged(payload.visible),
-      displayNameChange: (payload) => onDisplayNameChange(payload.displayname),
+      displayNameChange: (payload) =>
+        onDisplayNameChanged(payload.id, payload.displayname),
     });
 
     videoApi.executeCommand("subject", " ");
