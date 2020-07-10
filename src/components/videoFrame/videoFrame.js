@@ -19,12 +19,14 @@ export const VideoFrameComponent = ({
   onFilmStripStatusChanged,
   onShareScreenStatusChanged,
   onDisplayNameChanged,
-  videoInput,
-  audioInput,
-  audioOutput,
 }) => {
   useEffect(() => {
     if (videoApi) videoApi.dispose();
+
+    const storedVideoInput = JSON.parse(localStorage.getItem("videoInput"));
+    const storedAudioInput = JSON.parse(localStorage.getItem("audioInput"));
+    const audioOutput = null;
+
     const options = {
       roomName: `rolê_${roomName}`,
       parentNode: document.getElementById(parentNode),
@@ -32,14 +34,15 @@ export const VideoFrameComponent = ({
         displayName: displayName,
       },
       devices: {
-        ...(videoInput && { videoInput }),
-        ...(audioInput && { audioInput }),
+        ...(storedVideoInput && { videoInput: storedVideoInput }),
+        ...(storedAudioInput && { audioInput: storedAudioInput }),
         ...(audioOutput && { audioOutput }),
       },
       configOverwrite: {
         noSSL: true,
         resolution: 240,
         defaultLanguage: "en",
+        prejoinPageEnabled: false,
         liveStreamingEnabled: true,
         enableClosePage: false,
         enableWelcomePage: false,
@@ -60,6 +63,12 @@ export const VideoFrameComponent = ({
         },
       },
       interfaceConfigOverwrite: {
+        MOBILE_APP_PROMO: true,
+        SHOW_JITSI_WATERMARK: false,
+        SHOW_BRAND_WATERMARK: false,
+        SHOW_WATERMARK_FOR_GUESTS: false,
+        TOOLBAR_ALWAYS_VISIBLE: false,
+        DISABLE_VIDEO_BACKGROUND: true,
         DEFAULT_BACKGROUND: "white",
         DEFAULT_LOCAL_DISPLAY_NAME: "",
         DEFAULT_REMOTE_DISPLAY_NAME: null,
@@ -101,9 +110,6 @@ export const VideoFrameComponent = ({
           // "mute-everyone",
           // "security",
         ],
-        JITSI_WATERMARK_LINK: " ",
-        SHOW_JITSI_WATERMARK: false,
-        SHOW_WATERMARK_FOR_GUESTS: false,
       },
     };
     // eslint-disable-next-line no-undef
