@@ -1,0 +1,23 @@
+.youtubeVideoContainer {
+  width: 100%;
+  height: 80vh;
+  position: absolute;
+}
+
+.youtubeVideoTopBar {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: white;
+  background-color: black;
+  padding: 10px;
+}
+
+.youtubeVideoTopBarTitle {
+  margin-right: 10px;
+}
+
+#youtubeVideoFrame {
+  height: calc(100% - 56px);
+}

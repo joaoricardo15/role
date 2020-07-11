@@ -1,0 +1,32 @@
+.loadingContainer {
+  height: 80vh;
+  width: 50vh;
+  padding-top: 30px;
+  margin-left: calc((100vw - 50vh) / 2);
+}
+
+.loadingTitleContainer {
+  left: 0;
+  top: 60vh;
+  width: 100%;
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+}
+
+.loadingTitle {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 200;
+  margin-right: 10px;
+}
+
+.actionButtonContainer {
+  margin-top: 40px;
+}
+
+.actionButtonTitle {
+  margin-left: 10px;
+  margin-right: 10px;
+}

@@ -10,7 +10,6 @@ export const VideoFrameComponent = ({
   mic,
   camera,
   roomName,
-  displayName,
   onRoomLeave,
   onRoomEntered,
   onAudioStatusChanged,
@@ -23,6 +22,7 @@ export const VideoFrameComponent = ({
   useEffect(() => {
     if (videoApi) videoApi.dispose();
 
+    const displayName = localStorage.getItem("displayName");
     const storedVideoInput = JSON.parse(localStorage.getItem("videoInput"));
     const storedAudioInput = JSON.parse(localStorage.getItem("audioInput"));
     const audioOutput = null;
@@ -34,8 +34,8 @@ export const VideoFrameComponent = ({
         displayName: displayName,
       },
       devices: {
-        ...(storedVideoInput && { videoInput: storedVideoInput }),
-        ...(storedAudioInput && { audioInput: storedAudioInput }),
+        ...(storedVideoInput && { videoInput: storedVideoInput.label }),
+        ...(storedAudioInput && { audioInput: storedAudioInput.label }),
         ...(audioOutput && { audioOutput }),
       },
       configOverwrite: {

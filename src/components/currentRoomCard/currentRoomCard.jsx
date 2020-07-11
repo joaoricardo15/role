@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { WhatsappShareButton, WhatsappIcon } from "react-share";
 import { Card, TextField, Button, InputAdornment } from "@material-ui/core";
 import { FiMapPin } from "react-icons/fi";
+import "./currentRoomCard.style.css";
 
 const CurrentRoomCardComponent = ({
   roomName,
@@ -11,7 +12,7 @@ const CurrentRoomCardComponent = ({
   const [currentRoomAlias, setCurrentRoomAlias] = useState(roomAlias);
 
   return (
-    <Card className="currentRoomName">
+    <Card className="currentRoomNameContainer">
       <TextField
         color="secondary"
         value={currentRoomAlias}

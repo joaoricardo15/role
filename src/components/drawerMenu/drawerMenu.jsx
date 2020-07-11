@@ -24,14 +24,12 @@ const DrawerMenu = ({
   const [audioMenuOpenStatus, setAudioMenuOpenStatus] = useState(null);
 
   const changeVideoInput = (videoInput) => {
-    alert(JSON.stringify(videoInput));
     setVideoInputDevice(videoInput);
     localStorage.setItem("videoInput", JSON.stringify(videoInput));
     onVideoInputChange(videoInput);
   };
 
   const changeAudioInput = (audioInput) => {
-    alert(JSON.stringify(audioInput));
     setAudioInputDevice(audioInput);
     localStorage.setItem("audioInput", JSON.stringify(audioInput));
     onAudioInputChange(audioInput);

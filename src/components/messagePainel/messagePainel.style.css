@@ -1,0 +1,16 @@
+.messageContainer {
+  width: 100%;
+  bottom: calc(30vh - 30px);
+  display: flex;
+  position: absolute;
+  justify-content: center;
+}
+
+.sendMessageInput {
+  color: white !important;
+  border-color: white !important;
+}
+
+.sendMessageButton {
+  color: white !important;
+}

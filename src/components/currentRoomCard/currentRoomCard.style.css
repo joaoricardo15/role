@@ -1,4 +1,9 @@
-.currentRoomName {
+.currentRoomNameContainer {
   height: 80px;
   padding: 10px;
+}
+
+.inviteShareButton {
+  display: flex;
+  align-items: center;
 }

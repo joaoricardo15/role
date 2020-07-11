@@ -1,0 +1,72 @@
+.noRoomContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.coverImage {
+  position: absolute;
+  width: 65vh;
+  margin-left: -20px;
+}
+
+.cameraContainer {
+  width: 25vh;
+  height: 20vh;
+  display: flex;
+  overflow: hidden;
+  justify-content: center;
+  border-radius: 15vh;
+  margin-top: 10vh;
+}
+
+.camera {
+  height: 200%;
+  width: 200%;
+  margin-top: -30%;
+}
+
+.noCameraImage {
+  width: 30vh;
+  height: 30vh;
+  margin-top: 10vh;
+  animation: rotate 10s infinite linear;
+}
+
+.titleContainer {
+  top: 60vh;
+  width: 100%;
+  display: flex;
+  position: absolute;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 200;
+}
+
+.createRoomButtom {
+  font-weight: 800;
+  color: #f50057;
+  margin-left: 3px;
+  text-decoration: underline #f50057;
+}
+
+.roomButtonContainer {
+  top: 70vh;
+  width: 100%;
+  display: flex;
+  position: absolute;
+  justify-content: center;
+}
+
+.initialButtonsContainer {
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  height: 80px;
+  justify-content: space-between;
+  margin-top: -30px;
+}

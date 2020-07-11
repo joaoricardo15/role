@@ -1,0 +1,24 @@
+.controlPanelContainer {
+  display: flex;
+  padding: 20px 0;
+  justify-content: center;
+}
+
+.controlPanel {
+  width: 300px;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.initialControlPanel {
+  width: 100px;
+  display: flex;
+  justify-content: space-evenly;
+
+  position: absolute;
+  top: 46vh;
+}
+
+.controlPanelButton {
+  background-color: white !important;
+}
