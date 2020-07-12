@@ -10,6 +10,8 @@ import {
   FiGrid,
   FiPhoneMissed,
   FiShare,
+  FiChevronLeft,
+  FiChevronRight,
 } from "react-icons/fi";
 import { videoApi } from "./../../components/videoFrame/videoFrame";
 import "./controlPainel.style.css";
@@ -18,13 +20,15 @@ const ControlPainelComponent = ({
   currentRoomName,
   videoStatus,
   audioStatus,
-  messageInputStatus,
+  filmStripStatus,
   titleviewStatus,
   shareScreenStatus,
+  messageInputStatus,
   onToggleVideo,
   onToggleAudio,
   onToggleMessage,
   onToggleTileview,
+  onToggleFilmstrip,
   onToggleSharescreen,
   onToggleHangup,
 }) => {
@@ -43,6 +47,11 @@ const ControlPainelComponent = ({
     if (onToggleTileview) onToggleTileview();
   };
 
+  const changeFilmstripStatus = () => {
+    if (videoApi) videoApi.executeCommand("toggleFilmStrip");
+    if (onToggleFilmstrip) onToggleFilmstrip();
+  };
+
   const changeShareScreenStatus = () => {
     if (onToggleSharescreen) onToggleSharescreen();
     if (videoApi) videoApi.executeCommand("toggleShareScreen");
@@ -53,64 +62,84 @@ const ControlPainelComponent = ({
   };
 
   return (
-    <div className="controlPanelContainer">
-      <div
-        className={!currentRoomName ? "initialControlPanel" : "controlPanel"}
-      >
+    <>
+      <div className="controlPanelContainer">
+        <div
+          className={!currentRoomName ? "initialControlPanel" : "controlPanel"}
+        >
+          {!(currentRoomName && !filmStripStatus) && (
+            <>
+              <Fab
+                onClick={changeVideoStatus}
+                className="controlPanelButton"
+                size="small"
+              >
+                {videoStatus ? (
+                  <FiVideo />
+                ) : (
+                  <FiVideoOff style={{ color: "#f50057" }} />
+                )}
+              </Fab>
+              <Fab
+                onClick={changeAudioStatus}
+                className="controlPanelButton"
+                size="small"
+              >
+                {audioStatus ? (
+                  <FiMic />
+                ) : (
+                  <FiMicOff style={{ color: "#f50057" }} />
+                )}
+              </Fab>
+            </>
+          )}
+          {currentRoomName && filmStripStatus && (
+            <>
+              <Fab
+                size="small"
+                onClick={changeMessageInputStatus}
+                className="controlPanelButton"
+              >
+                <FiMessageSquare
+                  style={messageInputStatus && { color: "#f50057" }}
+                />
+              </Fab>
+
+              <Fab
+                size="small"
+                onClick={changeTileviewStatus}
+                className="controlPanelButton"
+              >
+                <FiGrid style={titleviewStatus && { color: "#f50057" }} />
+              </Fab>
+              <Fab
+                size="small"
+                className="controlPanelButton"
+                onClick={changeShareScreenStatus}
+              >
+                <FiShare style={shareScreenStatus && { color: "#f50057" }} />
+              </Fab>
+              <Fab size="small" color="secondary" onClick={onToggleHangup}>
+                <FiPhoneMissed />
+              </Fab>
+            </>
+          )}
+        </div>
+      </div>
+      {currentRoomName && (
         <Fab
-          onClick={changeVideoStatus}
-          className="controlPanelButton"
+          onClick={changeFilmstripStatus}
+          className="filmtripButton"
           size="small"
         >
-          {videoStatus ? (
-            <FiVideo />
+          {filmStripStatus ? (
+            <FiChevronRight />
           ) : (
-            <FiVideoOff style={{ color: "#f50057" }} />
+            <FiChevronLeft style={{ color: "#f50057" }} />
           )}
         </Fab>
-        <Fab
-          onClick={changeAudioStatus}
-          className="controlPanelButton"
-          size="small"
-        >
-          {audioStatus ? <FiMic /> : <FiMicOff style={{ color: "#f50057" }} />}
-        </Fab>
-        {currentRoomName && (
-          <Fab
-            size="small"
-            onClick={changeMessageInputStatus}
-            className="controlPanelButton"
-          >
-            <FiMessageSquare
-              style={messageInputStatus && { color: "#f50057" }}
-            />
-          </Fab>
-        )}
-        {currentRoomName && (
-          <Fab
-            size="small"
-            onClick={changeTileviewStatus}
-            className="controlPanelButton"
-          >
-            <FiGrid style={titleviewStatus && { color: "#f50057" }} />
-          </Fab>
-        )}
-        {currentRoomName && !isMobile && (
-          <Fab
-            size="small"
-            className="controlPanelButton"
-            onClick={changeShareScreenStatus}
-          >
-            <FiShare style={shareScreenStatus && { color: "#f50057" }} />
-          </Fab>
-        )}
-        {currentRoomName && (
-          <Fab size="small" color="secondary" onClick={onToggleHangup}>
-            <FiPhoneMissed />
-          </Fab>
-        )}
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 

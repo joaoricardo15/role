@@ -299,6 +299,7 @@ const MainPage = () => {
           isRandomRoomLoading ? (
             <LoadingPainelComponent
               imageSource={randomRoomAnimation}
+              loadingMessage="procurando sala no espaço..."
               onAction={() => requestRandomRoom(false)}
               onActionTitle={"Cancelar busca"}
             />
@@ -314,7 +315,10 @@ const MainPage = () => {
         ) : (
           <div>
             {isRoomLoading && (
-              <LoadingPainelComponent imageSource={launchAnimation} />
+              <LoadingPainelComponent
+                imageSource={launchAnimation}
+                loadingMessage="entrando na sala..."
+              />
             )}
             <div
               className={isRoomLoading ? "hiddenContainer" : "visibleContainer"}
@@ -326,7 +330,7 @@ const MainPage = () => {
                   onRoomAliasChange={changeRoomAlias}
                 />
               </div>
-              {youtubeVideo && youtubeVideo.videoId && (
+              {youtubeVideo && (
                 <YouTubePainelComponent
                   displayName={youtubeVideo.displayName}
                   videoId={youtubeVideo.videoId}
@@ -346,24 +350,25 @@ const MainPage = () => {
                 onShareScreenStatusChanged={onShareScreenStatusChanged}
                 onDisplayNameChanged={onChangeDisplayName}
               />
+              {messageInputStatus && (
+                <MessagePainelComponent
+                  message={message}
+                  onSendMessage={sendMessage}
+                />
+              )}
             </div>
           </div>
         )}
-        {messageInputStatus && (
-          <MessagePainelComponent
-            message={message}
-            onSendMessage={sendMessage}
-          />
-        )}
       </div>
-      {!isRoomLoading && !isRandomRoomLoading && filmStripStatus && (
+      {!isRoomLoading && !isRandomRoomLoading && (
         <ControlPainelComponent
           currentRoomName={currentRoomName}
           videoStatus={videoStatus}
           audioStatus={audioStatus}
           messageInputStatus={messageInputStatus}
-          titleviewStatus={titleviewStatus}
           shareScreenStatus={shareScreenStatus}
+          titleviewStatus={titleviewStatus}
+          filmStripStatus={filmStripStatus}
           onToggleVideo={() => setVideoStatus(!videoStatus)}
           onToggleAudio={() => setAudioStatus(!audioStatus)}
           onToggleMessage={() => setMessageInputStatus(!messageInputStatus)}

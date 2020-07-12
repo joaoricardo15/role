@@ -1,18 +1,14 @@
 .loadingContainer {
   height: 80vh;
   width: 50vh;
-  padding-top: 30px;
+  margin-top: 80px;
   margin-left: calc((100vw - 50vh) / 2);
 }
 
 .loadingTitleContainer {
-  left: 0;
-  top: 60vh;
-  width: 100%;
   display: flex;
-  position: absolute;
   justify-content: center;
-  align-items: center;
+  margin-top: 50px;
 }
 
 .loadingTitle {
@@ -23,6 +19,8 @@
 }
 
 .actionButtonContainer {
+  display: flex;
+  justify-content: center;
   margin-top: 40px;
 }
 

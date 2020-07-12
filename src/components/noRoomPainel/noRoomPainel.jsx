@@ -24,9 +24,6 @@ const NoRoomPainelComponent = ({
           />
         </div>
       )}
-      <div className="titleContainer">
-        <div className="title">você não está conectado</div>
-      </div>
       <div className="roomButtonContainer">
         <div
           className="initialButtonsContainer"
