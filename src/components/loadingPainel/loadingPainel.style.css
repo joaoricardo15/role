@@ -1,7 +1,7 @@
 .loadingContainer {
   height: 80vh;
   width: 50vh;
-  margin-top: 80px;
+  padding-top: 80px;
   margin-left: calc((100vw - 50vh) / 2);
 }
 

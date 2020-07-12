@@ -75,6 +75,7 @@ const MainPage = () => {
     setTitleviewStatus(false);
     setShareScreenStatus(false);
     setMessageInputStatus(false);
+    setYoutubeVideo(null);
     onRoomLeave();
   };
 
@@ -294,6 +295,13 @@ const MainPage = () => {
           </div>
         )}
       </Sticky>
+      {youtubeVideo && (
+        <YouTubePainelComponent
+          displayName={youtubeVideo.displayName}
+          videoId={youtubeVideo.videoId}
+          onClose={closeYoutubeVideo}
+        />
+      )}
       <div className="videoContainer">
         {!currentRoomName ? (
           isRandomRoomLoading ? (
@@ -330,13 +338,7 @@ const MainPage = () => {
                   onRoomAliasChange={changeRoomAlias}
                 />
               </div>
-              {youtubeVideo && (
-                <YouTubePainelComponent
-                  displayName={youtubeVideo.displayName}
-                  videoId={youtubeVideo.videoId}
-                  onClose={closeYoutubeVideo}
-                />
-              )}
+
               <VideoFrameComponent
                 mic={audioStatus}
                 camera={videoStatus}
@@ -359,22 +361,22 @@ const MainPage = () => {
             </div>
           </div>
         )}
+        {!isRoomLoading && !isRandomRoomLoading && (
+          <ControlPainelComponent
+            currentRoomName={currentRoomName}
+            videoStatus={videoStatus}
+            audioStatus={audioStatus}
+            messageInputStatus={messageInputStatus}
+            shareScreenStatus={shareScreenStatus}
+            titleviewStatus={titleviewStatus}
+            filmStripStatus={filmStripStatus}
+            onToggleVideo={() => setVideoStatus(!videoStatus)}
+            onToggleAudio={() => setAudioStatus(!audioStatus)}
+            onToggleMessage={() => setMessageInputStatus(!messageInputStatus)}
+            onToggleHangup={leaveRoom}
+          />
+        )}
       </div>
-      {!isRoomLoading && !isRandomRoomLoading && (
-        <ControlPainelComponent
-          currentRoomName={currentRoomName}
-          videoStatus={videoStatus}
-          audioStatus={audioStatus}
-          messageInputStatus={messageInputStatus}
-          shareScreenStatus={shareScreenStatus}
-          titleviewStatus={titleviewStatus}
-          filmStripStatus={filmStripStatus}
-          onToggleVideo={() => setVideoStatus(!videoStatus)}
-          onToggleAudio={() => setAudioStatus(!audioStatus)}
-          onToggleMessage={() => setMessageInputStatus(!messageInputStatus)}
-          onToggleHangup={leaveRoom}
-        />
-      )}
       {onlineRooms.length > 0 &&
         !(
           onlineRooms.length === 1 &&
