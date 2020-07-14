@@ -1,18 +1,28 @@
 import React, { useState } from "react";
-import { TextField, InputAdornment, Fab } from "@material-ui/core";
+import { TextField, withStyles, InputAdornment, Fab } from "@material-ui/core";
 import { MdSend } from "react-icons/md";
 import "./messagePainel.style.css";
+
+const CssTextField = withStyles({
+  root: {
+    "& .MuiFilledInput-multiline": {
+      width: 300,
+      padding: 10,
+      backgroundColor: "#fffffff0",
+    },
+  },
+})(TextField);
 
 const MessagePainelComponent = ({ message, onSendMessage }) => {
   const [localMessage, setMessage] = useState(message);
 
   return (
     <div className="messageContainer">
-      <TextField
+      <CssTextField
         multiline
         autoFocus
         rows={2}
-        rowsMax={4}
+        rowsMax={8}
         value={localMessage}
         color="secondary"
         variant="filled"

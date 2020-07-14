@@ -125,7 +125,7 @@ const DrawerMenu = ({
             action: null,
           },
         ].map((menu, index) => (
-          <ListItem button key={menu.text} onClick={menu.action}>
+          <ListItem button key={index} onClick={menu.action}>
             <ListItemIcon>{menu.icon}</ListItemIcon>
             <ListItemText primary={menu.text} />
             <Menu
@@ -136,8 +136,9 @@ const DrawerMenu = ({
               onClose={() => setVideoMenuOpenStatus(null)}
             >
               {devices.videoInputDevices &&
-                devices.videoInputDevices.map((videoDevice) => (
+                devices.videoInputDevices.map((videoDevice, index) => (
                   <MenuItem
+                    key={index}
                     onClick={(event) => {
                       setVideoMenuOpenStatus(null);
                       changeVideoInput({
@@ -181,8 +182,9 @@ const DrawerMenu = ({
               onClose={() => setAudioMenuOpenStatus(null)}
             >
               {devices.audioInputDevices &&
-                devices.audioInputDevices.map((audioDevice) => (
+                devices.audioInputDevices.map((audioDevice, index) => (
                   <MenuItem
+                    key={index}
                     onClick={(event) => {
                       setAudioMenuOpenStatus(null);
                       changeAudioInput({

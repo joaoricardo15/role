@@ -15,7 +15,7 @@ const LoadingPainelComponent = ({
       <img src={imageSource} width="100%" alt="loading" />
       <div className="loadingTitleContainer">
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ display: "flex" }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
             <div className="loadingTitle">{loadingMessage}</div>
             <ScaleLoader height={18} color="#f50057" loading={true} />
           </div>
@@ -23,9 +23,9 @@ const LoadingPainelComponent = ({
             <div className="actionButtonContainer">
               <Fab
                 size="small"
-                color="secondary"
                 variant="extended"
                 onClick={onAction}
+                className="actionButton"
               >
                 <FiX />
                 <div className={"actionButtonTitle"}>{onActionTitle}</div>

@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import Webcam from "react-webcam";
-import { FiMapPin, FiPlay } from "react-icons/fi";
+import { FiMapPin } from "react-icons/fi";
+import { GiAstronautHelmet } from "react-icons/gi";
 import { Fab } from "@material-ui/core";
+import ChooseRoomPainelComponent from "../chooseRoomPainel/chooseRoomPainel";
 import "./noRoomPainel.style.css";
 
 const NoRoomPainelComponent = ({
@@ -11,6 +13,14 @@ const NoRoomPainelComponent = ({
   videoStatus,
   videoInputDeviceId,
 }) => {
+  const [chooseRoomPainelVisibility, setChooseRoomPainelVisibility] = useState(
+    false
+  );
+
+  const closeRoom = () => {
+    setChooseRoomPainelVisibility(false);
+  };
+
   return (
     <div className="noRoomContainer">
       <img className="coverImage" src={imageSource} alt="astronautHelmet" />
@@ -24,43 +34,35 @@ const NoRoomPainelComponent = ({
           />
         </div>
       )}
-      <div className="roomButtonContainer">
-        <div
-          className="initialButtonsContainer"
-          style={{ flexDirection: "column" }}
+      <div className="navigateButtomContainer">
+        <Fab
+          size="small"
+          color="secondary"
+          variant="extended"
+          className="navigateButton"
+          onClick={() => setChooseRoomPainelVisibility(true)}
         >
-          <Fab
-            size="small"
-            color="secondary"
-            variant="outlined"
-            style={{
-              height: 20,
-              color: "#f50057",
-              backgroundColor: "white",
-            }}
-            onClick={onRandomRoom}
-          >
-            <FiPlay />
-            <div
-              style={{
-                marginLeft: 10,
-                marginRight: 10,
-                fontSize: 10,
-              }}
-            >
-              sala aleatória
-            </div>
-          </Fab>
-          <Fab
-            size="small"
-            color="secondary"
-            variant="extended"
-            onClick={onNewRoom}
-          >
-            <FiMapPin />
-            <div style={{ marginLeft: 10, marginRight: 10 }}>Criar sala</div>
-          </Fab>
-        </div>
+          <GiAstronautHelmet />
+          <div style={{ marginLeft: 10, marginRight: 10 }}>Explore!</div>
+        </Fab>
+      </div>
+      <div className="roomButtonContainer">
+        <Fab
+          size="small"
+          color="secondary"
+          variant="extended"
+          onClick={onNewRoom}
+        >
+          <FiMapPin />
+          <div style={{ marginLeft: 10, marginRight: 10 }}>Criar sala</div>
+        </Fab>
+        {chooseRoomPainelVisibility && (
+          <ChooseRoomPainelComponent
+            opened={chooseRoomPainelVisibility}
+            onClose={closeRoom}
+            onRandomRoom={onRandomRoom}
+          />
+        )}
       </div>
     </div>
   );

@@ -1,14 +1,17 @@
 .noRoomContainer {
+  height: 70vh;
   width: 100%;
   display: flex;
+  position: relative;
   justify-content: center;
+  overflow: hidden;
   padding-top: 50px;
 }
 
 .coverImage {
+  height: 50vh;
   position: absolute;
-  width: 65vh;
-  margin-left: -20px;
+  margin-left: -30px;
 }
 
 .cameraContainer {
@@ -42,17 +45,45 @@
 }
 
 .roomButtonContainer {
-  top: 60vh;
-  width: 100%;
+  top: calc(50vh + 100px);
   display: flex;
   position: absolute;
-  justify-content: center;
+  justify-content: space-between;
 }
 
-.initialButtonsContainer {
-  width: auto;
-  display: flex;
-  flex-direction: column;
-  height: 80px;
-  justify-content: space-between;
+.navigateButtomContainer {
+  top: 50px;
+  left: calc(50vw + 2vh);
+  position: absolute;
+}
+
+.rotateImage {
+  height: 40px;
+  /* animation: rotate 10s infinite linear; */
+}
+
+@keyframes rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.navigateButton {
+  color: #424242 !important;
+  background-color: white !important;
+  text-transform: capitalize !important;
+}
+
+.navigateButton::before {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  top: 100%;
+  left: 1.5em;
+  transform: rotate(180deg);
+  border: 0.75rem solid transparent;
+  border-top: none;
+  border-bottom-color: #fff;
+  filter: drop-shadow(0 -0.0625rem 0.0625rem rgba(0, 0, 0, 0.1));
 }

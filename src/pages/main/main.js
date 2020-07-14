@@ -135,9 +135,10 @@ const MainPage = () => {
 
   const onFilmStripStatusChanged = (filmStripStatus) => {
     setFilmStripStatus(filmStripStatus);
+    if (!filmStripStatus && messageInputStatus) setMessageInputStatus(false);
   };
 
-  const onChangeDisplayName = (id, name) => {
+  const onDisplayNameChanged = (id, name) => {
     if (id === localStorage.getItem("connectionid")) {
       if (name !== displayName) setDisplayName(name);
       localStorage.setItem("displayName", name || "");
@@ -307,7 +308,7 @@ const MainPage = () => {
           isRandomRoomLoading ? (
             <LoadingPainelComponent
               imageSource={randomRoomAnimation}
-              loadingMessage="procurando sala no espaço..."
+              loadingMessage="procurando participantes..."
               onAction={() => requestRandomRoom(false)}
               onActionTitle={"Cancelar busca"}
             />
@@ -350,7 +351,7 @@ const MainPage = () => {
                 onTileviewStatusChanged={onTileviewStatusChanged}
                 onFilmStripStatusChanged={onFilmStripStatusChanged}
                 onShareScreenStatusChanged={onShareScreenStatusChanged}
-                onDisplayNameChanged={onChangeDisplayName}
+                onDisplayNameChanged={onDisplayNameChanged}
               />
               {messageInputStatus && (
                 <MessagePainelComponent

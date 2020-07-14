@@ -12,7 +12,7 @@
 }
 
 .initialControlPanel {
-  top: 48vh;
+  top: calc(50vh + 30px);
   width: 100px;
   display: flex;
   position: absolute;

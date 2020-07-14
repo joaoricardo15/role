@@ -1,0 +1,23 @@
+.filterTagContainer {
+  height: 24px !important;
+  color: #f50057 !important;
+  background-color: white !important;
+  margin: 5px !important;
+}
+
+.filterTagSelectedContainer {
+  height: 24px !important;
+  margin: 5px !important;
+}
+
+.filterTagTitle {
+  font-size: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.findRoomButtonContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}

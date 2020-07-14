@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiAtSign, FiMenu } from "react-icons/fi";
 import {
   IconButton,
@@ -27,6 +27,10 @@ const TopMenuComponent = ({
 }) => {
   const [localDisplayName, setDisplayName] = useState(displayName);
 
+  useEffect(() => {
+    if (displayName !== localDisplayName) setDisplayName(displayName);
+  }, [displayName]);
+
   return (
     <div className="headerFirstLine">
       <div className="greetings">
@@ -35,9 +39,8 @@ const TopMenuComponent = ({
           value={localDisplayName}
           placeholder="seu apelido"
           className="greetingsInput"
-          textOverflow="ellipsis"
           onChange={(e) => setDisplayName(e.target.value)}
-          onBlur={() => onDisplayNameChange(displayName)}
+          onBlur={() => onDisplayNameChange(localDisplayName)}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
